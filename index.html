@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cricket Team Splitter (Role Wise)</title>
+
+    <!-- Download libs -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg1: #0b1220;
+            --bg2: #0f172a;
+            --stroke: rgba(255, 255, 255, .08);
+            --text: #e5e7eb;
+            --muted: #94a3b8;
+            --shadow: 0 18px 40px rgba(0, 0, 0, .35);
+            --radius: 18px;
+
+            --green: rgba(34, 197, 94, .95);
+            --blue: rgba(96, 165, 250, .95);
+            --red: rgba(239, 68, 68, .85);
+            --gold: rgba(250, 204, 21, .85);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            background: radial-gradient(1200px 700px at 20% 10%, #1d4ed8 0%, transparent 55%),
+                radial-gradient(900px 600px at 90% 30%, #22c55e 0%, transparent 55%),
+                linear-gradient(180deg, var(--bg1), var(--bg2));
+            color: var(--text);
+            min-height: 100vh;
+            padding: 28px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.1fr .9fr;
+            gap: 16px;
+            margin-top: 14px;
+        }
+
+        @media (max-width: 980px) {
+            .grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .03));
+            border: 1px solid var(--stroke);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+
+        .card h2 {
+            margin: 0 0 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .badge {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--stroke);
+            background: rgba(255, 255, 255, .04);
+            color: var(--muted);
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 12px;
+            border-radius: 14px;
+            border: 1px solid var(--stroke);
+            background: rgba(15, 23, 42, .55);
+            color: var(--text);
+            outline: none;
+            transition: .2s ease;
+        }
+
+        input::placeholder {
+            color: rgba(148, 163, 184, .7)
+        }
+
+        input:focus,
+        select:focus {
+            border-color: rgba(96, 165, 250, .8);
+            box-shadow: 0 0 0 4px rgba(96, 165, 250, .15);
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 12px 14px;
+            border: 1px solid var(--stroke);
+            background: rgba(255, 255, 255, .06);
+            color: var(--text);
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: .18s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, .09);
+        }
+
+        .btn:active {
+            transform: translateY(0px)
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            border: none;
+            color: #06121f;
+        }
+
+        .btn.danger {
+            background: rgba(239, 68, 68, .14);
+            border: 1px solid rgba(239, 68, 68, .25);
+            color: #fecaca;
+        }
+
+        .btn.small {
+            padding: 8px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--stroke);
+            margin: 14px 0;
+        }
+
+        .two {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        @media (max-width:540px) {
+            .two {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .players {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 450px;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .player {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid var(--stroke);
+            background: rgba(255, 255, 255, .04);
+        }
+
+        .player .left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .player .name {
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .roleTag {
+            width: max-content;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--stroke);
+            color: var(--muted);
+            background: rgba(15, 23, 42, .35);
+        }
+
+        .teamsWrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width:980px) {
+            .teamsWrap {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .teamCard {
+            border-radius: var(--radius);
+            border: 1px solid var(--stroke);
+            background: rgba(255, 255, 255, .04);
+            padding: 14px;
+        }
+
+        .teamHeader {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .teamTitle strong {
+            font-size: 16px;
+        }
+
+        .metaSmall {
+            margin-top: 6px;
+            font-size: 12px;
+            color: rgba(148, 163, 184, .95);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            border: 1px solid var(--stroke);
+            background: rgba(255, 255, 255, .04);
+            padding: 4px 10px;
+            border-radius: 999px;
+            width: max-content;
+        }
+
+        .capTag {
+            border-color: rgba(250, 204, 21, .28);
+            background: rgba(250, 204, 21, .08);
+            color: #fff7cc;
+        }
+
+        .vcTag {
+            border-color: rgba(96, 165, 250, .28);
+            background: rgba(96, 165, 250, .08);
+            color: #dbeafe;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .listItem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(15, 23, 42, .4);
+            border: 1px solid var(--stroke);
+        }
+
+        .empty {
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px dashed rgba(255, 255, 255, .18);
+            color: rgba(148, 163, 184, .9);
+            text-align: center;
+            background: rgba(15, 23, 42, .25);
+            margin-top: 10px;
+        }
+
+        .commonBox {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 18px;
+            border: 1px solid rgba(250, 204, 21, .28);
+            background: rgba(250, 204, 21, .08);
+        }
+
+        .commonBox h3 {
+            margin: 0 0 8px;
+            font-size: 14px;
+        }
+
+        .toast {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid var(--stroke);
+            background: rgba(15, 23, 42, .45);
+            color: rgba(226, 232, 240, .92);
+            font-size: 13px;
+            display: none;
+        }
+
+        .toast.show {
+            display: block
+        }
+
+        .notice {
+            margin-top: 10px;
+            color: rgba(148, 163, 184, .95);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .downloadWrap {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, .10);
+            background: rgba(15, 23, 42, .35);
+        }
+
+        #captureArea {
+            border-radius: 18px;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Cricket Team Selection</h1>
+        </header>
+
+        <div class="grid">
+            <!-- LEFT: Players -->
+            <div class="card">
+                <h2>Players <span class="badge" id="playerCountBadge">0 Players</span></h2>
+
+                <div class="two">
+                    <input id="playerName" type="text" placeholder="Enter player name" />
+                    <select id="playerRole">
+                        <option value="Batsman">Batsman</option>
+                        <option value="Bowler">Bowler</option>
+                        <option value="Allrounder">Allrounder</option>
+                        <option value="Wicket keeper">Wicket keeper</option>
+                    </select>
+                </div>
+
+                <div class="row">
+                    <button class="btn primary" id="addBtn">Add Player</button>
+                    <button class="btn danger" id="clearBtn">Clear All</button>
+                </div>
+
+                <div class="divider"></div>
+
+                <h2>Player List <span class="badge">Role</span></h2>
+                <div class="players" id="playersList"></div>
+                <div class="toast" id="toast"></div>
+            </div>
+
+            <!-- RIGHT: Settings + Teams -->
+            <div class="card">
+                <h2>Team Settings <span class="badge">Customize</span></h2>
+
+                <div class="two">
+                    <input id="teamAName" type="text" placeholder="Team A Name" value="Team A" />
+                    <input id="teamBName" type="text" placeholder="Team B Name" value="Team B" />
+                </div>
+
+                <div class="divider"></div>
+
+                <h2>Common Player <span class="badge">Manual</span></h2>
+                <select id="commonSelect">
+                    <option value="">Auto Select (last player)</option>
+                </select>
+                <div class="notice">✅ Used only when players count is odd.</div>
+
+                <div class="row" style="margin-top:12px;">
+                    <button class="btn primary" id="splitBtn">⚡ Split Teams</button>
+                    <button class="btn" id="shuffleBtn">🔄 Shuffle & Split</button>
+                </div>
+
+                <div class="divider"></div>
+
+                <div id="captureArea">
+                    <h2>Teams Output <span class="badge">Role Balanced</span></h2>
+
+                    <div class="teamsWrap">
+                        <!-- Team A -->
+                        <div class="teamCard">
+                            <div class="teamHeader">
+                                <div class="teamTitle"><strong id="teamATitle">Team A</strong></div>
+                                <span class="badge" id="teamACount">0</span>
+                            </div>
+
+                            <div class="two">
+                                <select id="captainA">
+                                    <option value="">Select Captain (Team A)</option>
+                                </select>
+                                <select id="viceCaptainA">
+                                    <option value="">Select Vice Captain (Team A)</option>
+                                </select>
+                            </div>
+
+                            <div class="metaSmall" id="capMetaA"></div>
+                            <div class="list" id="teamAList"></div>
+                            <div class="empty" id="teamAEmpty">No players yet</div>
+                        </div>
+
+                        <!-- Team B -->
+                        <div class="teamCard">
+                            <div class="teamHeader">
+                                <div class="teamTitle"><strong id="teamBTitle">Team B</strong></div>
+                                <span class="badge" id="teamBCount">0</span>
+                            </div>
+
+                            <div class="two">
+                                <select id="captainB">
+                                    <option value="">Select Captain (Team B)</option>
+                                </select>
+                                <select id="viceCaptainB">
+                                    <option value="">Select Vice Captain (Team B)</option>
+                                </select>
+                            </div>
+
+                            <div class="metaSmall" id="capMetaB"></div>
+                            <div class="list" id="teamBList"></div>
+                            <div class="empty" id="teamBEmpty">No players yet</div>
+                        </div>
+                    </div>
+
+                    <div class="commonBox" id="commonBox" style="display:none;">
+                        <h3>⭐ Common Player</h3>
+                        <div id="commonPlayer"></div>
+                    </div>
+                </div>
+
+                <div class="downloadWrap">
+                    <h2>Download / Share <span class="badge">PNG / PDF / WhatsApp</span></h2>
+                    <div class="row">
+                        <button class="btn" id="downloadPNG">🖼️ PNG</button>
+                        <button class="btn" id="downloadPDF">📄 PDF</button>
+                        <button class="btn primary" id="copyWhatsapp">📋 WhatsApp</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===========================
+        // LocalStorage Keys
+        // ===========================
+        const LS_PLAYERS = "cricket_players_role_v1";
+        const LS_TEAMA = "cricket_teamA_name_role_v1";
+        const LS_TEAMB = "cricket_teamB_name_role_v1";
+
+        // ===========================
+        // State
+        // ===========================
+        let players = []; // { name, role }
+        let lastSplit = { teamA: [], teamB: [], common: null };
+
+        // ===========================
+        // Elements
+        // ===========================
+        const playerName = document.getElementById("playerName");
+        const playerRole = document.getElementById("playerRole");
+        const addBtn = document.getElementById("addBtn");
+        const clearBtn = document.getElementById("clearBtn");
+
+        const playersList = document.getElementById("playersList");
+        const playerCountBadge = document.getElementById("playerCountBadge");
+
+        const teamAName = document.getElementById("teamAName");
+        const teamBName = document.getElementById("teamBName");
+
+        const splitBtn = document.getElementById("splitBtn");
+        const shuffleBtn = document.getElementById("shuffleBtn");
+
+        const teamATitle = document.getElementById("teamATitle");
+        const teamBTitle = document.getElementById("teamBTitle");
+        const teamAList = document.getElementById("teamAList");
+        const teamBList = document.getElementById("teamBList");
+
+        const teamAEmpty = document.getElementById("teamAEmpty");
+        const teamBEmpty = document.getElementById("teamBEmpty");
+
+        const teamACount = document.getElementById("teamACount");
+        const teamBCount = document.getElementById("teamBCount");
+
+        const commonSelect = document.getElementById("commonSelect");
+
+        const commonBox = document.getElementById("commonBox");
+        const commonPlayer = document.getElementById("commonPlayer");
+
+        const toast = document.getElementById("toast");
+
+        const captainA = document.getElementById("captainA");
+        const viceCaptainA = document.getElementById("viceCaptainA");
+        const captainB = document.getElementById("captainB");
+        const viceCaptainB = document.getElementById("viceCaptainB");
+
+        const capMetaA = document.getElementById("capMetaA");
+        const capMetaB = document.getElementById("capMetaB");
+
+        const captureArea = document.getElementById("captureArea");
+        const downloadPNG = document.getElementById("downloadPNG");
+        const downloadPDF = document.getElementById("downloadPDF");
+        const copyWhatsapp = document.getElementById("copyWhatsapp");
+
+        // ===========================
+        // Helpers
+        // ===========================
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 1600);
+        }
+
+        function normalizeName(name) {
+            return name.trim().replace(/\s+/g, " ");
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem(LS_PLAYERS, JSON.stringify(players));
+            localStorage.setItem(LS_TEAMA, teamAName.value);
+            localStorage.setItem(LS_TEAMB, teamBName.value);
+        }
+
+        function loadFromLocalStorage() {
+            const savedPlayers = localStorage.getItem(LS_PLAYERS);
+            const savedA = localStorage.getItem(LS_TEAMA);
+            const savedB = localStorage.getItem(LS_TEAMB);
+
+            if (savedPlayers) {
+                try {
+                    players = JSON.parse(savedPlayers) || [];
+                } catch (e) {
+                    players = [];
+                }
+            }
+
+            if (savedA) teamAName.value = savedA;
+            if (savedB) teamBName.value = savedB;
+        }
+
+        function updatePlayerCount() {
+            playerCountBadge.textContent = `${players.length} Players`;
+        }
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function clearTeams() {
+            lastSplit = { teamA: [], teamB: [], common: null };
+            teamAList.innerHTML = "";
+            teamBList.innerHTML = "";
+            teamAEmpty.style.display = "block";
+            teamBEmpty.style.display = "block";
+            teamACount.textContent = "0";
+            teamBCount.textContent = "0";
+            commonBox.style.display = "none";
+            commonPlayer.innerHTML = "";
+
+            fillCaptainDropdowns([], []);
+            updateCaptainTags();
+        }
+
+        function renderPlayers() {
+            updatePlayerCount();
+            playersList.innerHTML = "";
+
+            if (players.length === 0) {
+                playersList.innerHTML = `<div class="empty">Add players to start splitting 🏏</div>`;
+                updateCommonDropdown();
+                saveToLocalStorage();
+                return;
+            }
+
+            players.forEach((p, idx) => {
+                const div = document.createElement("div");
+                div.className = "player";
+                div.innerHTML = `
+          <div class="left">
+            <div class="name">${p.name}</div>
+            <span class="roleTag">${p.role}</span>
+          </div>
+          <button class="btn small danger" onclick="removePlayer(${idx})">Remove</button>
+        `;
+                playersList.appendChild(div);
+            });
+
+            updateCommonDropdown();
+            saveToLocalStorage();
+        }
+
+        function removePlayer(index) {
+            const removed = players.splice(index, 1);
+            renderPlayers();
+            clearTeams();
+            showToast(`Removed: ${removed[0].name}`);
+        }
+
+        function updateCommonDropdown() {
+            const currentValue = commonSelect.value;
+
+            commonSelect.innerHTML = `<option value="">Auto Select (last player)</option>`;
+            players.forEach((p) => {
+                const opt = document.createElement("option");
+                opt.value = p.name;
+                opt.textContent = `${p.name} (${p.role})`;
+                commonSelect.appendChild(opt);
+            });
+
+            if ([...commonSelect.options].some(o => o.value === currentValue)) {
+                commonSelect.value = currentValue;
+            } else {
+                commonSelect.value = "";
+            }
+        }
+
+        function renderTeamList(container, emptyEl, list) {
+            container.innerHTML = "";
+            if (list.length === 0) {
+                emptyEl.style.display = "block";
+                return;
+            }
+            emptyEl.style.display = "none";
+
+            list.forEach(p => {
+                const item = document.createElement("div");
+                item.className = "listItem";
+                item.innerHTML = `
+          <div style="font-weight:800">${p.name}</div>
+          <span class="roleTag">${p.role}</span>
+        `;
+                container.appendChild(item);
+            });
+        }
+
+        function fillSelect(selectEl, options, placeholder) {
+            const current = selectEl.value;
+            selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+            options.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.name;
+                opt.textContent = `${p.name} (${p.role})`;
+                selectEl.appendChild(opt);
+            });
+
+            if (options.some(p => p.name === current)) {
+                selectEl.value = current;
+            } else {
+                selectEl.value = "";
+            }
+        }
+
+        function fillCaptainDropdowns(teamA, teamB) {
+            fillSelect(captainA, teamA, "Select Captain (Team A)");
+            fillSelect(viceCaptainA, teamA, "Select Vice Captain (Team A)");
+            fillSelect(captainB, teamB, "Select Captain (Team B)");
+            fillSelect(viceCaptainB, teamB, "Select Vice Captain (Team B)");
+        }
+
+        function updateCaptainTags() {
+            const capA = captainA.value;
+            const vcA = viceCaptainA.value;
+            const capB = captainB.value;
+            const vcB = viceCaptainB.value;
+
+            capMetaA.innerHTML = "";
+            capMetaB.innerHTML = "";
+
+            if (capA) capMetaA.innerHTML += `<span class="tag capTag">👑 Captain: <b>${capA}</b></span>`;
+            if (vcA) capMetaA.innerHTML += `<span class="tag vcTag">⭐ Vice: <b>${vcA}</b></span>`;
+
+            if (capB) capMetaB.innerHTML += `<span class="tag capTag">👑 Captain: <b>${capB}</b></span>`;
+            if (vcB) capMetaB.innerHTML += `<span class="tag vcTag">⭐ Vice: <b>${vcB}</b></span>`;
+        }
+
+        function validateCaptainVice() {
+            if (captainA.value && viceCaptainA.value && captainA.value === viceCaptainA.value) {
+                showToast("Team A: Captain & Vice cannot be same ⚠️");
+                viceCaptainA.value = "";
+            }
+            if (captainB.value && viceCaptainB.value && captainB.value === viceCaptainB.value) {
+                showToast("Team B: Captain & Vice cannot be same ⚠️");
+                viceCaptainB.value = "";
+            }
+            updateCaptainTags();
+        }
+
+        // ✅ Role grouping
+        function groupByRole(list) {
+            const roles = {
+                "Wicket keeper": [],
+                "Batsman": [],
+                "Allrounder": [],
+                "Bowler": []
+            };
+
+            list.forEach(p => {
+                if (!roles[p.role]) roles[p.role] = [];
+                roles[p.role].push(p);
+            });
+
+            return roles;
+        }
+
+        // ✅ ROLE-WISE BALANCED + EQUAL TEAM SIZE
+        function splitByRoleEqual(list, targetSize) {
+            const roles = groupByRole(list);
+            const roleOrder = ["Wicket keeper", "Batsman", "Allrounder", "Bowler"];
+
+            roleOrder.forEach(r => shuffleArray(roles[r])); // random inside role
+
+            const teamA = [];
+            const teamB = [];
+
+            // Step 1: split each role half-half
+            roleOrder.forEach(role => {
+                const arr = roles[role];
+                const half = Math.floor(arr.length / 2);
+
+                teamA.push(...arr.slice(0, half));
+                teamB.push(...arr.slice(half, half + half));
+
+                // leftover (if odd) keep aside
+                roles[role] = arr.slice(half + half);
+            });
+
+            // Step 2: distribute leftovers to keep equal size
+            roleOrder.forEach(role => {
+                const leftovers = roles[role];
+                leftovers.forEach(p => {
+                    // give extra to team that has less players
+                    if (teamA.length < targetSize) teamA.push(p);
+                    else teamB.push(p);
+                });
+            });
+
+            // Step 3: final safety (ensure exact sizes)
+            while (teamA.length > targetSize) {
+                teamB.push(teamA.pop());
+            }
+            while (teamB.length > targetSize) {
+                teamA.push(teamB.pop());
+            }
+
+            return { teamA, teamB };
+        }
+
+        function splitTeams(doShuffle = false) {
+            const A = normalizeName(teamAName.value || "Team A");
+            const B = normalizeName(teamBName.value || "Team B");
+
+            teamATitle.textContent = A;
+            teamBTitle.textContent = B;
+
+            if (players.length < 2) {
+                showToast("Add at least 2 players ✅");
+                return;
+            }
+
+            let list = [...players];
+            if (doShuffle) list = shuffleArray(list);
+
+            let common = null;
+
+            // odd => manual common
+            if (list.length % 2 === 1) {
+                const selectedCommon = commonSelect.value;
+
+                if (selectedCommon) {
+                    const found = list.find(p => p.name === selectedCommon);
+                    if (found) {
+                        common = found;
+                        list = list.filter(p => p.name !== selectedCommon);
+                    } else {
+                        common = list.pop();
+                    }
+                } else {
+                    common = list.pop();
+                }
+            }
+
+            const targetSize = list.length / 2;
+
+            // ✅ role-wise equal split
+            const result = splitByRoleEqual(list, targetSize);
+
+            lastSplit = { teamA: result.teamA, teamB: result.teamB, common };
+
+            renderTeamList(teamAList, teamAEmpty, lastSplit.teamA);
+            renderTeamList(teamBList, teamBEmpty, lastSplit.teamB);
+
+            teamACount.textContent = lastSplit.teamA.length;
+            teamBCount.textContent = lastSplit.teamB.length;
+
+            fillCaptainDropdowns(lastSplit.teamA, lastSplit.teamB);
+            updateCaptainTags();
+
+            if (common) {
+                commonBox.style.display = "block";
+                commonPlayer.innerHTML = `
+          <div class="listItem" style="border-color: rgba(250,204,21,.28)">
+            <div style="font-weight:800">${common.name}</div>
+            <span class="roleTag">${common.role}</span>
+          </div>
+          <div style="margin-top:8px;color:rgba(148,163,184,.95);font-size:12px;">
+            This player plays for <b>both Team A & Team B</b>.
+          </div>
+        `;
+            } else {
+                commonBox.style.display = "none";
+                commonPlayer.innerHTML = "";
+            }
+
+            showToast(`Role split ✅ (${lastSplit.teamA.length} vs ${lastSplit.teamB.length})`);
+            saveToLocalStorage();
+        }
+
+        // WhatsApp Format
+        function buildWhatsAppText() {
+            if (lastSplit.teamA.length === 0 && lastSplit.teamB.length === 0) return "";
+
+            const teamA = normalizeName(teamAName.value || "Team A");
+            const teamB = normalizeName(teamBName.value || "Team B");
+
+            const capA = captainA.value || "Not Selected";
+            const vcA = viceCaptainA.value || "Not Selected";
+            const capB = captainB.value || "Not Selected";
+            const vcB = viceCaptainB.value || "Not Selected";
+
+            const common = lastSplit.common ? `${lastSplit.common.name} (${lastSplit.common.role})` : "None";
+
+            const formatList = (arr) =>
+                arr.map((p, i) => `${i + 1}. ${p.name} (${p.role})`).join("\n");
+
+            return `
+🏏 *CRICKET TEAMS (ROLE WISE)*
+
+🟢 *${teamA}*
+👑 Captain: *${capA}*
+⭐ Vice Captain: *${vcA}*
+Players:
+${formatList(lastSplit.teamA)}
+
+🔵 *${teamB}*
+👑 Captain: *${capB}*
+⭐ Vice Captain: *${vcB}*
+Players:
+${formatList(lastSplit.teamB)}
+
+⭐ *COMMON PLAYER*: *${common}*
+`.trim();
+        }
+
+        async function copyWhatsAppToClipboard() {
+            if (lastSplit.teamA.length === 0 && lastSplit.teamB.length === 0) {
+                showToast("Split teams first ✅");
+                return;
+            }
+            const text = buildWhatsAppText();
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast("Copied for WhatsApp ✅");
+            } catch (err) {
+                const textarea = document.createElement("textarea");
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textarea);
+                showToast("Copied (fallback) ✅");
+            }
+        }
+
+        // Download PNG
+        async function downloadAsPNG() {
+            if (lastSplit.teamA.length === 0 && lastSplit.teamB.length === 0) {
+                showToast("Split teams first ✅");
+                return;
+            }
+            showToast("Preparing PNG... ⏳");
+            const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: null });
+            const dataURL = canvas.toDataURL("image/png");
+            const a = document.createElement("a");
+            a.href = dataURL;
+            a.download = "cricket-teams-role.png";
+            a.click();
+            showToast("PNG downloaded ✅");
+        }
+
+        // Download PDF
+        async function downloadAsPDF() {
+            if (lastSplit.teamA.length === 0 && lastSplit.teamB.length === 0) {
+                showToast("Split teams first ✅");
+                return;
+            }
+            showToast("Preparing PDF... ⏳");
+
+            const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: "#0f172a" });
+            const imgData = canvas.toDataURL("image/png");
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF("p", "mm", "a4");
+
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            const imgWidth = pageWidth;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            const y = 8;
+            if (imgHeight > pageHeight - 16) {
+                const scale = (pageHeight - 16) / imgHeight;
+                pdf.addImage(imgData, "PNG", 0, y, imgWidth * scale, imgHeight * scale);
+            } else {
+                pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
+            }
+
+            pdf.save("cricket-teams-role.pdf");
+            showToast("PDF downloaded ✅");
+        }
+
+        // ===========================
+        // Events
+        // ===========================
+        addBtn.addEventListener("click", () => {
+            const name = normalizeName(playerName.value);
+            const role = playerRole.value;
+
+            if (!name) {
+                showToast("Enter player name ✅");
+                return;
+            }
+
+            const exists = players.some(p => p.name.toLowerCase() === name.toLowerCase());
+            if (exists) {
+                showToast("Player already exists ⚠️");
+                return;
+            }
+
+            players.push({ name, role });
+            playerName.value = "";
+            playerName.focus();
+
+            renderPlayers();
+            clearTeams();
+            showToast("Player added ✅");
+        });
+
+        playerName.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") addBtn.click();
+        });
+
+        clearBtn.addEventListener("click", () => {
+            players = [];
+            renderPlayers();
+            clearTeams();
+            showToast("Cleared all players 🗑️");
+        });
+
+        splitBtn.addEventListener("click", () => splitTeams(false));
+        shuffleBtn.addEventListener("click", () => splitTeams(true));
+
+        teamAName.addEventListener("input", saveToLocalStorage);
+        teamBName.addEventListener("input", saveToLocalStorage);
+
+        captainA.addEventListener("change", validateCaptainVice);
+        viceCaptainA.addEventListener("change", validateCaptainVice);
+        captainB.addEventListener("change", validateCaptainVice);
+        viceCaptainB.addEventListener("change", validateCaptainVice);
+
+        downloadPNG.addEventListener("click", downloadAsPNG);
+        downloadPDF.addEventListener("click", downloadAsPDF);
+        copyWhatsapp.addEventListener("click", copyWhatsAppToClipboard);
+
+        // init
+        loadFromLocalStorage();
+        renderPlayers();
+        clearTeams();
+
+        window.removePlayer = removePlayer;
+    </script>
+</body>
+
+</html>
