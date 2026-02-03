@@ -544,18 +544,14 @@
             max-width: 100%;
             min-width: 0;
         }
-        
+
     </style>
 </head>
 
 <body>
     <div class="container">
         <header>
-            <h1>🏏 Team Selection (Role Wise Balanced)</h1>
-            <p>
-                Add players with role, split equally by role, choose Common player manually if odd.
-                After split → go to Scorecard page.
-            </p>
+            <h1>Team Selection</h1>
         </header>
 
         <div class="grid">
@@ -564,7 +560,7 @@
                 <h2>Players <span class="badge" id="playerCountBadge">0 Players</span></h2>
 
                 <div class="two">
-                    <input id="playerName" type="text" placeholder="Enter player name (ex: Dhoni)" />
+                    <input id="playerName" type="text" placeholder="Enter player name" />
                     <select id="playerRole">
                         <option value="Batsman">Batsman</option>
                         <option value="Bowler">Bowler</option>
@@ -574,11 +570,9 @@
                 </div>
 
                 <div class="row">
-                    <button class="btn primary" id="addBtn">➕ Add Player</button>
-                    <button class="btn danger" id="clearBtn">🗑️ Clear All</button>
+                    <button class="btn primary" id="addBtn">Add Player</button>
+                    <button class="btn danger" id="clearBtn">Clear All</button>
                 </div>
-
-                <div class="notice">✅ Saved in LocalStorage automatically</div>
 
                 <div class="divider"></div>
                 <h2>Player List <span class="badge">Role</span></h2>
@@ -601,12 +595,11 @@
                 <select id="commonSelect">
                     <option value="">Auto Select (last player)</option>
                 </select>
-                <div class="notice">✅ Used only when total players are odd</div>
 
                 <div class="row" style="margin-top:12px;">
-                    <button class="btn primary" id="splitBtn">⚡ Split Teams</button>
-                    <button class="btn" id="shuffleBtn">🔄 Shuffle & Split</button>
-                    <button class="btn primary" id="gotoScorecard">📊 Scorecard</button>
+                    <button class="btn primary" id="splitBtn">Split Teams</button>
+                    <button class="btn" id="shuffleBtn">Shuffle & Split</button>
+                    <button class="btn primary" id="gotoScorecard">Scorecard</button>
                 </div>
 
                 <div class="divider"></div>

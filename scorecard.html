@@ -400,17 +400,13 @@
     <div class="container">
         <header>
             <div>
-                <h1>📊 Full Match Scorecard</h1>
-                <p>
-                    ✅ Wide = +1 run & re-ball | ✅ NoBall = +1 run & re-ball | ❌ No Freehit <br />
-                    Includes: Strike Rate (Batsman) + Economy (Bowler) + Result
-                </p>
+                <h1>Full Match Scorecard</h1>
             </div>
             <div class="row">
-                <button class="btn" id="backBtn">⬅️ Back</button>
-                <button class="btn" id="clearScorecard">🗑️ Clear Scorecard</button>
-                <button class="btn primary" id="downloadInnings1">🖼️ Innings 1 PNG</button>
-                <button class="btn primary" id="downloadInnings2">🖼️ Innings 2 PNG</button>
+                <button class="btn" id="backBtn">Back</button>
+                <button class="btn" id="clearScorecard">Clear Scorecard</button>
+                <button class="btn primary" id="downloadInnings1">Download Innings 1</button>
+                <button class="btn primary" id="downloadInnings2">Download Innings 2 </button>
             </div>
 
         </header>
@@ -421,16 +417,13 @@
             <div class="three">
                 <select id="batFirst"></select>
                 <input id="oversLimit" type="number" min="1" placeholder="Overs Limit (ex: 5 / 10 / 20)" />
-                <button class="btn primary" id="startMatch">✅ Start Match</button>
+                <button class="btn primary" id="startMatch">Start Match</button>
             </div>
-            <p style="margin:8px 0 0;color:var(--muted);font-size:12px;">
-                Overs limit optional. If you enter overs limit, app will show "Overs completed" check.
-            </p>
         </div>
 
         <!-- RESULT -->
         <div class="card" id="resultCard" style="display:none;">
-            <h3 style="margin:0 0 8px;">🏆 Match Result</h3>
+            <h3 style="margin:0 0 8px;">Match Result</h3>
             <div class="resultBox" id="resultText"></div>
         </div>
 
@@ -438,7 +431,7 @@
         <div class="card" id="innings1Card">
             <div id="captureInnings1">
                 <div class="row" style="justify-content:space-between;">
-                    <h3 style="margin:0;">🏏 Innings 1</h3>
+                    <h3 style="margin:0;">Innings 1</h3>
                     <span class="badge" id="innings1Info">Not Started</span>
                 </div>
 
@@ -514,9 +507,9 @@
             </div>
 
             <div class="row" style="margin-top:10px;">
-                <button class="btn primary" id="i1AddBall">➕ Add Ball</button>
-                <button class="btn" id="i1Undo">↩️ Undo</button>
-                <button class="btn" id="i1EndInnings">✅ End Innings 1</button>
+                <button class="btn primary" id="i1AddBall">Add Ball</button>
+                <button class="btn" id="i1Undo">Undo</button>
+                <button class="btn" id="i1EndInnings">End Innings 1</button>
             </div>
 
             <div class="log" id="i1Log"></div>
@@ -526,7 +519,7 @@
         <div class="card" id="innings2Card">
             <div id="captureInnings2">
                 <div class="row" style="justify-content:space-between;">
-                    <h3 style="margin:0;">🏏 Innings 2</h3>
+                    <h3 style="margin:0;">Innings 2</h3>
                     <span class="badge" id="innings2Info">Not Started</span>
                 </div>
 
@@ -604,9 +597,9 @@
             </div>
 
             <div class="row" style="margin-top:10px;">
-                <button class="btn primary" id="i2AddBall">➕ Add Ball</button>
-                <button class="btn" id="i2Undo">↩️ Undo</button>
-                <button class="btn primary" id="i2EndMatch">🏁 End Match</button>
+                <button class="btn primary" id="i2AddBall">Add Ball</button>
+                <button class="btn" id="i2Undo">Undo</button>
+                <button class="btn primary" id="i2EndMatch">End Match</button>
             </div>
 
             <div class="log" id="i2Log"></div>
