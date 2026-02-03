@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Full Match Scorecard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --text: #e5e7eb;
+            --muted: #94a3b8;
+            --radius: 18px;
+            --control-h: 46px;
+            /* change if you want bigger (ex: 50px) */
+            --control-pad-x: 14px;
+            --control-font: 14px;
+        }
+
+        body {
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            min-height: 100vh;
+            padding: 28px;
+            color: var(--text);
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(rgba(5, 15, 30, 0.55), rgba(5, 15, 30, 0.55)),
+                url("backround.jpg");
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .card {
+            background: rgba(10, 20, 35, 0.55);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            padding: 16px;
+            margin-top: 14px;
+            animation: fadeUp 0.45s ease both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0px);
+            }
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .two {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .three {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media(max-width:1000px) {
+
+            .two,
+            .three {
+                grid-template-columns: 1fr
+            }
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, .14);
+            background: rgba(15, 23, 42, 0.35);
+            color: var(--text);
+            outline: none;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .btn {
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, .14);
+            background: rgba(255, 255, 255, .06);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 700;
+            transition: .18s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, .10);
+        }
+
+        .btn.primary {
+            border: 1px solid rgba(34, 197, 94, .22);
+            background: linear-gradient(135deg, rgba(34, 197, 94, .95), rgba(96, 165, 250, .92));
+            color: #06121f;
+        }
+
+        .badge {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, .14);
+            background: rgba(255, 255, 255, .06);
+            color: var(--muted);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        @media(max-width:1000px) {
+            .stats {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        .stat {
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 16px;
+            background: rgba(15, 23, 42, .35);
+            padding: 12px;
+        }
+
+        .label {
+            color: var(--muted);
+            font-size: 12px
+        }
+
+        .value {
+            font-size: 20px;
+            font-weight: 900;
+            margin-top: 6px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+
+        th,
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, .10);
+            font-size: 13px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            color: rgba(226, 232, 240, .95);
+            font-size: 12px;
+            letter-spacing: .3px;
+            background: rgba(255, 255, 255, .05);
+        }
+
+        tr {
+            background: rgba(255, 255, 255, .03);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, .06);
+        }
+
+        .pillOut {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(239, 68, 68, .12);
+            border: 1px solid rgba(239, 68, 68, .22);
+            color: #fecaca;
+            width: max-content;
+        }
+
+        .pillNotOut {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(34, 197, 94, .10);
+            border: 1px solid rgba(34, 197, 94, .20);
+            color: #bbf7d0;
+            width: max-content;
+        }
+
+        .log {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 220px;
+            overflow: auto;
+        }
+
+        .item {
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 14px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, .04);
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, .12);
+            margin: 14px 0;
+        }
+
+        .resultBox {
+            padding: 14px;
+            border-radius: 18px;
+            border: 1px solid rgba(250, 204, 21, .25);
+            background: rgba(250, 204, 21, .08);
+            margin-top: 12px;
+        }
+
+        #captureInnings1,
+        #captureInnings2 {
+            border-radius: 18px;
+            padding: 10px;
+        }
+
+        input,
+        select,
+        button {
+            font-size: var(--control-font);
+            line-height: 1.2;
+        }
+
+        /* ✅ Inputs + dropdowns same height */
+        input,
+        select {
+            height: var(--control-h);
+            padding: 0 var(--control-pad-x);
+            border-radius: 14px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+
+            /* your glass style */
+            background: rgba(15, 23, 42, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            color: var(--text);
+        }
+
+        /* ✅ Placeholder vertically centered */
+        input::placeholder {
+            color: rgba(148, 163, 184, 0.75);
+            font-size: var(--control-font);
+            line-height: var(--control-h);
+        }
+
+        /* ✅ Fix number input padding/align */
+        input[type="number"] {
+            padding-right: 12px;
+        }
+
+        /* ✅ Custom dropdown arrow (pure CSS) */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+
+            /* space for arrow */
+            padding-right: 44px;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            /* Arrow icon using background */
+            background-image:
+                linear-gradient(45deg, transparent 50%, rgba(226, 232, 240, .9) 50%),
+                linear-gradient(135deg, rgba(226, 232, 240, .9) 50%, transparent 50%),
+                linear-gradient(to right, rgba(255, 255, 255, .12), rgba(255, 255, 255, .12));
+            background-position:
+                calc(100% - 18px) 52%,
+                calc(100% - 12px) 52%,
+                calc(100% - 42px) 50%;
+            background-size:
+                6px 6px,
+                6px 6px,
+                1px 60%;
+            background-repeat: no-repeat;
+        }
+
+        /* ✅ On hover: arrow more visible */
+        select:hover {
+            border-color: rgba(255, 255, 255, .20);
+        }
+
+        /* ✅ Focus style consistent */
+        input:focus,
+        select:focus {
+            border-color: rgba(96, 165, 250, .75);
+            box-shadow: 0 0 0 4px rgba(96, 165, 250, .15);
+            outline: none;
+        }
+
+        /* ✅ Buttons same height as inputs */
+        .btn {
+            height: var(--control-h);
+            padding: 0 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ✅ Small buttons stay small but aligned */
+        .btn.small {
+            height: 34px;
+            padding: 0 12px;
+        }
+
+        /* ✅ Prevent overlap issue in grids */
+        .two>*,
+        .three>* {
+            min-width: 0 !important;
+        }
+
+        input,
+        select {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>📊 Full Match Scorecard</h1>
+                <p>
+                    ✅ Wide = +1 run & re-ball | ✅ NoBall = +1 run & re-ball | ❌ No Freehit <br />
+                    Includes: Strike Rate (Batsman) + Economy (Bowler) + Result
+                </p>
+            </div>
+            <div class="row">
+                <button class="btn" id="backBtn">⬅️ Back</button>
+                <button class="btn" id="clearScorecard">🗑️ Clear Scorecard</button>
+                <button class="btn primary" id="downloadInnings1">🖼️ Innings 1 PNG</button>
+                <button class="btn primary" id="downloadInnings2">🖼️ Innings 2 PNG</button>
+            </div>
+
+        </header>
+
+        <!-- MATCH SETUP -->
+        <div class="card">
+            <h3 style="margin:0 0 10px;">1) Match Setup</h3>
+            <div class="three">
+                <select id="batFirst"></select>
+                <input id="oversLimit" type="number" min="1" placeholder="Overs Limit (ex: 5 / 10 / 20)" />
+                <button class="btn primary" id="startMatch">✅ Start Match</button>
+            </div>
+            <p style="margin:8px 0 0;color:var(--muted);font-size:12px;">
+                Overs limit optional. If you enter overs limit, app will show "Overs completed" check.
+            </p>
+        </div>
+
+        <!-- RESULT -->
+        <div class="card" id="resultCard" style="display:none;">
+            <h3 style="margin:0 0 8px;">🏆 Match Result</h3>
+            <div class="resultBox" id="resultText"></div>
+        </div>
+
+        <!-- INNINGS 1 -->
+        <div class="card" id="innings1Card">
+            <div id="captureInnings1">
+                <div class="row" style="justify-content:space-between;">
+                    <h3 style="margin:0;">🏏 Innings 1</h3>
+                    <span class="badge" id="innings1Info">Not Started</span>
+                </div>
+
+                <div class="stats">
+                    <div class="stat">
+                        <div class="label">Runs</div>
+                        <div class="value" id="i1Runs">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Wickets</div>
+                        <div class="value" id="i1Wkts">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Overs</div>
+                        <div class="value" id="i1Overs">0.0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Extras</div>
+                        <div class="value" id="i1Extras">0</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <h4 style="margin:0 0 6px;">Batting</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Status</th>
+                            <th>R</th>
+                            <th>B</th>
+                            <th>4s</th>
+                            <th>6s</th>
+                            <th>SR</th>
+                        </tr>
+                    </thead>
+                    <tbody id="i1BatTable"></tbody>
+                </table>
+
+                <h4 style="margin:14px 0 6px;">Bowling</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Bowler</th>
+                            <th>O</th>
+                            <th>R</th>
+                            <th>W</th>
+                            <th>ECO</th>
+                        </tr>
+                    </thead>
+                    <tbody id="i1BowlTable"></tbody>
+                </table>
+            </div>
+
+            <div class="divider"></div>
+
+            <h4 style="margin:0 0 8px;">Ball Input (Innings 1)</h4>
+            <div class="two">
+                <select id="i1Striker"></select>
+                <select id="i1NonStriker"></select>
+            </div>
+
+            <div class="three" style="margin-top:10px;">
+                <select id="i1Bowler"></select>
+                <select id="i1BallType">
+                    <option value="legal">Legal Ball</option>
+                    <option value="wide">Wide (+1, re-ball)</option>
+                    <option value="noball">No Ball (+1, re-ball)</option>
+                    <option value="wicket">Wicket (legal)</option>
+                </select>
+                <input id="i1BallRuns" type="number" min="0" placeholder="Runs (0/1/2/3/4/6)" />
+            </div>
+
+            <div class="row" style="margin-top:10px;">
+                <button class="btn primary" id="i1AddBall">➕ Add Ball</button>
+                <button class="btn" id="i1Undo">↩️ Undo</button>
+                <button class="btn" id="i1EndInnings">✅ End Innings 1</button>
+            </div>
+
+            <div class="log" id="i1Log"></div>
+        </div>
+
+        <!-- INNINGS 2 -->
+        <div class="card" id="innings2Card">
+            <div id="captureInnings2">
+                <div class="row" style="justify-content:space-between;">
+                    <h3 style="margin:0;">🏏 Innings 2</h3>
+                    <span class="badge" id="innings2Info">Not Started</span>
+                </div>
+
+                <div class="stats">
+                    <div class="stat">
+                        <div class="label">Runs</div>
+                        <div class="value" id="i2Runs">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Wickets</div>
+                        <div class="value" id="i2Wkts">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Overs</div>
+                        <div class="value" id="i2Overs">0.0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Extras</div>
+                        <div class="value" id="i2Extras">0</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <h4 style="margin:0 0 6px;">Batting</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Status</th>
+                            <th>R</th>
+                            <th>B</th>
+                            <th>4s</th>
+                            <th>6s</th>
+                            <th>SR</th>
+                        </tr>
+                    </thead>
+                    <tbody id="i2BatTable"></tbody>
+                </table>
+
+                <h4 style="margin:14px 0 6px;">Bowling</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Bowler</th>
+                            <th>O</th>
+                            <th>R</th>
+                            <th>W</th>
+                            <th>ECO</th>
+                        </tr>
+                    </thead>
+                    <tbody id="i2BowlTable"></tbody>
+                </table>
+
+                <div class="resultBox" id="targetBox" style="display:none; margin-top:12px;"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <h4 style="margin:0 0 8px;">Ball Input (Innings 2)</h4>
+            <div class="two">
+                <select id="i2Striker"></select>
+                <select id="i2NonStriker"></select>
+            </div>
+
+            <div class="three" style="margin-top:10px;">
+                <select id="i2Bowler"></select>
+                <select id="i2BallType">
+                    <option value="legal">Legal Ball</option>
+                    <option value="wide">Wide (+1, re-ball)</option>
+                    <option value="noball">No Ball (+1, re-ball)</option>
+                    <option value="wicket">Wicket (legal)</option>
+                </select>
+                <input id="i2BallRuns" type="number" min="0" placeholder="Runs (0/1/2/3/4/6)" />
+            </div>
+
+            <div class="row" style="margin-top:10px;">
+                <button class="btn primary" id="i2AddBall">➕ Add Ball</button>
+                <button class="btn" id="i2Undo">↩️ Undo</button>
+                <button class="btn primary" id="i2EndMatch">🏁 End Match</button>
+            </div>
+
+            <div class="log" id="i2Log"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===========================
+        // Storage Keys
+        // ===========================
+        const LS_TEAMA = "cricket_teamA_name_role_v1";
+        const LS_TEAMB = "cricket_teamB_name_role_v1";
+        const LS_SPLIT = "cricket_last_split_v1";
+        const LS_MATCH = "cricket_full_match_v1";
+
+        // ===========================
+        // Helpers
+        // ===========================
+
+        function isOddRun(r) {
+            return r % 2 === 1;
+        }
+
+        function swapStrikers(strikerSel, nonStrikerSel) {
+            const temp = strikerSel.value;
+            strikerSel.value = nonStrikerSel.value;
+            nonStrikerSel.value = temp;
+        }
+
+        function refreshBatsmanDropdowns(inn, strikerSel, nonStrikerSel) {
+            const available = inn.battingPlayers.filter(p => !inn.batsmen[p.name].out);
+
+            // Keep selected if still available
+            fillSelect(strikerSel, available, "Select Striker");
+            fillSelect(nonStrikerSel, available, "Select Non-Striker");
+        }
+
+        function refreshBowlerDropdown(inn, bowlerSel) {
+            fillSelect(bowlerSel, inn.bowlingPlayers, "Select Bowler");
+        }
+
+
+        function oversText(lb) {
+            const o = Math.floor(lb / 6);
+            const b = lb % 6;
+            return `${o}.${b}`;
+        }
+
+        function calcSR(runs, balls) {
+            if (balls === 0) return "0.00";
+            return ((runs / balls) * 100).toFixed(2);
+        }
+
+        function calcECO(runs, legalBalls) {
+            if (legalBalls === 0) return "0.00";
+            const overs = legalBalls / 6;
+            return (runs / overs).toFixed(2);
+        }
+
+        function fillSelect(selectEl, list, placeholder) {
+            const current = selectEl.value;
+            selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+            list.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.name;
+                opt.textContent = `${p.name} (${p.role})`;
+                selectEl.appendChild(opt);
+            });
+            if (list.some(p => p.name === current)) selectEl.value = current;
+            else selectEl.value = "";
+        }
+
+        function makeBatsmanStats(players) {
+            const obj = {};
+            players.forEach(p => {
+                obj[p.name] = {
+                    name: p.name,
+                    role: p.role,
+                    runs: 0,
+                    balls: 0,
+                    fours: 0,
+                    sixes: 0,
+                    out: false
+                };
+            });
+            return obj;
+        }
+
+        function makeBowlerStats(players) {
+            const obj = {};
+            players.forEach(p => {
+                obj[p.name] = {
+                    name: p.name,
+                    role: p.role,
+                    runs: 0,
+                    legalBalls: 0,
+                    wkts: 0
+                };
+            });
+            return obj;
+        }
+
+        // ===========================
+        // Match State
+        // ===========================
+        let splitData = null;
+        let teamAName = "Team A";
+        let teamBName = "Team B";
+
+        const match = {
+            started: false,
+            oversLimit: 0, // optional
+
+            innings1: null,
+            innings2: null,
+
+            currentInnings: 1,
+            ended1: false,
+            ended2: false,
+            target: null
+        };
+
+        function createInnings(battingName, bowlingName, battingPlayers, bowlingPlayers) {
+            return {
+                battingName,
+                bowlingName,
+
+                runs: 0,
+                wkts: 0,
+                legalBalls: 0,
+                wides: 0,
+                noballs: 0,
+
+                events: [],
+
+                batsmen: makeBatsmanStats(battingPlayers),
+                bowlers: makeBowlerStats(bowlingPlayers),
+
+                battingPlayers,
+                bowlingPlayers
+            };
+        }
+
+        // ===========================
+        // Elements
+        // ===========================
+        const backBtn = document.getElementById("backBtn");
+        const downloadInnings1 = document.getElementById("downloadInnings1");
+        const downloadInnings2 = document.getElementById("downloadInnings2");
+        const clearScorecard = document.getElementById("clearScorecard");
+
+
+        const batFirst = document.getElementById("batFirst");
+        const oversLimit = document.getElementById("oversLimit");
+        const startMatch = document.getElementById("startMatch");
+
+        const resultCard = document.getElementById("resultCard");
+        const resultText = document.getElementById("resultText");
+
+        // innings 1
+        const innings1Info = document.getElementById("innings1Info");
+        const i1Runs = document.getElementById("i1Runs");
+        const i1Wkts = document.getElementById("i1Wkts");
+        const i1Overs = document.getElementById("i1Overs");
+        const i1Extras = document.getElementById("i1Extras");
+        const i1BatTable = document.getElementById("i1BatTable");
+        const i1BowlTable = document.getElementById("i1BowlTable");
+        const i1Log = document.getElementById("i1Log");
+        const i1Striker = document.getElementById("i1Striker");
+        const i1NonStriker = document.getElementById("i1NonStriker");
+        const i1Bowler = document.getElementById("i1Bowler");
+        const i1BallType = document.getElementById("i1BallType");
+        const i1BallRuns = document.getElementById("i1BallRuns");
+        const i1AddBall = document.getElementById("i1AddBall");
+        const i1Undo = document.getElementById("i1Undo");
+        const i1EndInnings = document.getElementById("i1EndInnings");
+
+        // innings 2
+        const innings2Info = document.getElementById("innings2Info");
+        const i2Runs = document.getElementById("i2Runs");
+        const i2Wkts = document.getElementById("i2Wkts");
+        const i2Overs = document.getElementById("i2Overs");
+        const i2Extras = document.getElementById("i2Extras");
+        const i2BatTable = document.getElementById("i2BatTable");
+        const i2BowlTable = document.getElementById("i2BowlTable");
+        const i2Log = document.getElementById("i2Log");
+        const i2Striker = document.getElementById("i2Striker");
+        const i2NonStriker = document.getElementById("i2NonStriker");
+        const i2Bowler = document.getElementById("i2Bowler");
+        const i2BallType = document.getElementById("i2BallType");
+        const i2BallRuns = document.getElementById("i2BallRuns");
+        const i2AddBall = document.getElementById("i2AddBall");
+        const i2Undo = document.getElementById("i2Undo");
+        const i2EndMatch = document.getElementById("i2EndMatch");
+        const targetBox = document.getElementById("targetBox");
+
+        const captureInnings1 = document.getElementById("captureInnings1");
+        const captureInnings2 = document.getElementById("captureInnings2");
+
+        // ===========================
+        // Render Functions
+        // ===========================
+
+        function clearFullScorecard() {
+            const ok = confirm("Clear full match scorecard? (Innings 1 & 2 will reset)");
+            if (!ok) return;
+
+            // ✅ Remove saved match scorecard only
+            localStorage.removeItem(LS_MATCH);
+
+            // ✅ Reset match object
+            match.started = false;
+            match.oversLimit = 0;
+
+            match.innings1 = null;
+            match.innings2 = null;
+
+            match.currentInnings = 1;
+            match.ended1 = false;
+            match.ended2 = false;
+
+            match.target = null;
+
+            // ✅ Reset UI
+            oversLimit.value = "";
+            batFirst.value = "";
+
+            innings1Info.textContent = "Not Started";
+            innings2Info.textContent = "Not Started";
+
+            targetBox.style.display = "none";
+            resultCard.style.display = "none";
+            resultText.innerHTML = "";
+
+            // Clear dropdowns
+            fillSelect(i1Striker, [], "Select Striker");
+            fillSelect(i1NonStriker, [], "Select Non-Striker");
+            fillSelect(i1Bowler, [], "Select Bowler");
+
+            fillSelect(i2Striker, [], "Select Striker");
+            fillSelect(i2NonStriker, [], "Select Non-Striker");
+            fillSelect(i2Bowler, [], "Select Bowler");
+
+            // Clear tables/logs quickly
+            i1BatTable.innerHTML = "";
+            i1BowlTable.innerHTML = "";
+            i1Log.innerHTML = `<div class="item"><span>No balls yet</span><span>🏏</span></div>`;
+
+            i2BatTable.innerHTML = "";
+            i2BowlTable.innerHTML = "";
+            i2Log.innerHTML = `<div class="item"><span>No balls yet</span><span>🏏</span></div>`;
+
+            // Reset stats numbers
+            i1Runs.textContent = "0";
+            i1Wkts.textContent = "0";
+            i1Overs.textContent = "0.0";
+            i1Extras.textContent = "0";
+
+            i2Runs.textContent = "0";
+            i2Wkts.textContent = "0";
+            i2Overs.textContent = "0.0";
+            i2Extras.textContent = "0";
+
+            alert("Scorecard cleared ✅");
+        }
+
+        function renderInnings(inn, ui) {
+            // top stats
+            ui.runs.textContent = inn.runs;
+            ui.wkts.textContent = inn.wkts;
+            ui.overs.textContent = oversText(inn.legalBalls);
+            ui.extras.textContent = `${inn.wides + inn.noballs} (WD ${inn.wides} + NB ${inn.noballs})`;
+
+            // batting table
+            const batArr = Object.values(inn.batsmen);
+            ui.batTable.innerHTML = "";
+            batArr.forEach(b => {
+                const status = b.out ? `<span class="pillOut">OUT</span>` : `<span class="pillNotOut">NOT OUT</span>`;
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+          <td><b>${b.name}</b> <span style="color:rgba(148,163,184,.9)">(${b.role})</span></td>
+          <td>${status}</td>
+          <td><b>${b.runs}</b></td>
+          <td>${b.balls}</td>
+          <td>${b.fours}</td>
+          <td>${b.sixes}</td>
+          <td><b>${calcSR(b.runs, b.balls)}</b></td>
+        `;
+                ui.batTable.appendChild(tr);
+            });
+
+            // bowling table
+            const bowlArr = Object.values(inn.bowlers);
+            ui.bowlTable.innerHTML = "";
+            bowlArr.forEach(bo => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+          <td><b>${bo.name}</b> <span style="color:rgba(148,163,184,.9)">(${bo.role})</span></td>
+          <td>${oversText(bo.legalBalls)}</td>
+          <td>${bo.runs}</td>
+          <td><b>${bo.wkts}</b></td>
+          <td><b>${calcECO(bo.runs, bo.legalBalls)}</b></td>
+        `;
+                ui.bowlTable.appendChild(tr);
+            });
+
+            // log
+            ui.log.innerHTML = "";
+            if (inn.events.length === 0) {
+                ui.log.innerHTML = `<div class="item"><span>No balls yet</span><span>🏏</span></div>`;
+            } else {
+                inn.events.slice().reverse().forEach(e => {
+                    const div = document.createElement("div");
+                    div.className = "item";
+                    div.innerHTML = `
+            <span><b>${e.label}</b> | Striker: <b>${e.striker}</b> | Bowler: <b>${e.bowler}</b></span>
+            <span class="badge">${e.over}</span>
+          `;
+                    ui.log.appendChild(div);
+                });
+            }
+        }
+
+        function saveMatch() {
+            localStorage.setItem(LS_MATCH, JSON.stringify(match));
+        }
+
+        function loadMatch() {
+            const saved = localStorage.getItem(LS_MATCH);
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.assign(match, data);
+            } catch (e) { }
+        }
+
+        function initSetup() {
+            teamAName = localStorage.getItem(LS_TEAMA) || "Team A";
+            teamBName = localStorage.getItem(LS_TEAMB) || "Team B";
+
+            const s = localStorage.getItem(LS_SPLIT);
+            if (!s) {
+                alert("Split teams first in Team Selection page!");
+                window.location.href = "index.html";
+                return;
+            }
+            splitData = JSON.parse(s);
+
+            batFirst.innerHTML = `
+        <option value="">Select Batting First</option>
+        <option value="A">${teamAName}</option>
+        <option value="B">${teamBName}</option>
+      `;
+        }
+
+        function startNewMatch() {
+            const choice = batFirst.value;
+            if (!choice) {
+                alert("Select Batting First ✅");
+                return;
+            }
+
+            match.started = true;
+            match.currentInnings = 1;
+            match.ended1 = false;
+            match.ended2 = false;
+            match.target = null;
+
+            const ov = Number(oversLimit.value || 0);
+            match.oversLimit = ov > 0 ? ov : 0;
+
+            const isA = choice === "A";
+
+            // innings 1: batting = chosen
+            const i1Bat = isA ? splitData.teamA : splitData.teamB;
+            const i1Bowl = isA ? splitData.teamB : splitData.teamA;
+
+            match.innings1 = createInnings(
+                isA ? teamAName : teamBName,
+                isA ? teamBName : teamAName,
+                i1Bat,
+                i1Bowl
+            );
+
+            // innings 2: swapped
+            match.innings2 = createInnings(
+                isA ? teamBName : teamAName,
+                isA ? teamAName : teamBName,
+                i1Bowl,
+                i1Bat
+            );
+
+            innings1Info.textContent = `${match.innings1.battingName} Batting`;
+            innings2Info.textContent = "Waiting...";
+
+            // Fill dropdowns for innings1
+            fillSelect(i1Striker, match.innings1.battingPlayers, "Select Striker");
+            fillSelect(i1NonStriker, match.innings1.battingPlayers, "Select Non-Striker");
+            fillSelect(i1Bowler, match.innings1.bowlingPlayers, "Select Bowler");
+
+            // reset innings2 dropdowns
+            fillSelect(i2Striker, [], "Select Striker");
+            fillSelect(i2NonStriker, [], "Select Non-Striker");
+            fillSelect(i2Bowler, [], "Select Bowler");
+
+            targetBox.style.display = "none";
+            resultCard.style.display = "none";
+            resultText.innerHTML = "";
+
+            saveMatch();
+            renderAll();
+            alert("Match Started ✅ Innings 1 ready!");
+        }
+
+        function renderAll() {
+            if (!match.innings1 || !match.innings2) return;
+
+            renderInnings(match.innings1, {
+                runs: i1Runs, wkts: i1Wkts, overs: i1Overs, extras: i1Extras,
+                batTable: i1BatTable, bowlTable: i1BowlTable, log: i1Log
+            });
+
+            renderInnings(match.innings2, {
+                runs: i2Runs, wkts: i2Wkts, overs: i2Overs, extras: i2Extras,
+                batTable: i2BatTable, bowlTable: i2BowlTable, log: i2Log
+            });
+
+            // target UI
+            if (match.target) {
+                targetBox.style.display = "block";
+                const need = match.target - match.innings2.runs;
+                if (need > 0) {
+                    targetBox.innerHTML = `🎯 Target: <b>${match.target}</b> | Need <b>${need}</b> runs`;
+                } else {
+                    targetBox.innerHTML = `🎯 Target: <b>${match.target}</b> | Target Chased ✅`;
+                }
+            }
+
+            // result
+            if (match.ended2) {
+                showResult();
+            }
+        }
+
+        // ===========================
+        // Ball Logic (Wide/NB reball, no freehit)
+        // ===========================
+        function addBallToInnings(inn, strikerSel, nonStrikerSel, bowlerSel, typeSel, runsInput) {
+            if (!match.started) {
+                alert("Start match first ✅");
+                return;
+            }
+
+            // ✅ must pick striker/non-striker/bowler
+            const strikerName = strikerSel.value;
+            const nonStrikerName = nonStrikerSel.value;
+            const bowlerName = bowlerSel.value;
+            const type = typeSel.value;
+            const runs = Number(runsInput.value || 0);
+
+            if (!strikerName || !nonStrikerName) {
+                alert("Select Striker and Non-Striker ✅");
+                return;
+            }
+            if (strikerName === nonStrikerName) {
+                alert("Striker and Non-Striker cannot be same ✅");
+                return;
+            }
+            if (!bowlerName) {
+                alert("Select Bowler ✅");
+                return;
+            }
+
+            const batsman = inn.batsmen[strikerName];
+            const bow = inn.bowlers[bowlerName];
+
+            if (!batsman || batsman.out) {
+                alert("This striker is OUT. Select a new batsman ✅");
+                refreshBatsmanDropdowns(inn, strikerSel, nonStrikerSel);
+                return;
+            }
+
+            // ✅ overs limit check
+            if (match.oversLimit > 0) {
+                const maxLegalBalls = match.oversLimit * 6;
+                if (inn.legalBalls >= maxLegalBalls) {
+                    alert("Overs limit completed ✅ End innings now!");
+                    return;
+                }
+            }
+
+            const overBefore = oversText(inn.legalBalls);
+            let label = "";
+
+            // ✅ Track if legal ball happened
+            let isLegalBall = false;
+
+            if (type === "wide") {
+                // +1 run, NOT legal ball
+                inn.runs += 1;
+                inn.wides += 1;
+                bow.runs += 1;
+                label = "WIDE +1";
+
+            } else if (type === "noball") {
+                // +1 run, NOT legal ball
+                inn.runs += 1;
+                inn.noballs += 1;
+                bow.runs += 1;
+                label = "NO BALL +1";
+
+            } else if (type === "wicket") {
+                // ✅ legal ball + wicket
+                isLegalBall = true;
+
+                inn.legalBalls += 1;
+                inn.wkts += 1;
+
+                batsman.balls += 1;
+                batsman.runs += runs;
+                inn.runs += runs;
+
+                if (runs === 4) batsman.fours += 1;
+                if (runs === 6) batsman.sixes += 1;
+
+                bow.legalBalls += 1;
+                bow.runs += runs;
+                bow.wkts += 1;
+
+                batsman.out = true;
+
+                label = `WICKET +${runs}`;
+
+            } else {
+                // ✅ legal ball normal
+                isLegalBall = true;
+
+                inn.legalBalls += 1;
+
+                batsman.balls += 1;
+                batsman.runs += runs;
+                inn.runs += runs;
+
+                if (runs === 4) batsman.fours += 1;
+                if (runs === 6) batsman.sixes += 1;
+
+                bow.legalBalls += 1;
+                bow.runs += runs;
+
+                label = `RUNS +${runs}`;
+            }
+
+            // Save event
+            inn.events.push({
+                type,
+                striker: strikerName,
+                nonStriker: nonStrikerName,
+                bowler: bowlerName,
+                runs: (type === "wide" || type === "noball") ? 1 : runs,
+                label,
+                over: `${overBefore} → ${oversText(inn.legalBalls)}`
+            });
+
+            // ✅ Strike rotation rules
+            // Only for legal balls (wide/noball = re-ball)
+            if (isLegalBall) {
+                // 1/3/5 => rotate strike
+                if (type !== "wicket" && isOddRun(runs)) {
+                    swapStrikers(strikerSel, nonStrikerSel);
+                }
+
+                // ✅ Over completed => swap strike + force new bowler
+                if (inn.legalBalls % 6 === 0) {
+                    // end of over = strike swap
+                    swapStrikers(strikerSel, nonStrikerSel);
+
+                    // force new bowler selection
+                    bowlerSel.value = "";
+                    alert("Over completed ✅ Select next bowler");
+                }
+
+                // ✅ If wicket happened, striker is out => must select new batsman
+                if (type === "wicket") {
+                    strikerSel.value = "";
+                    refreshBatsmanDropdowns(inn, strikerSel, nonStrikerSel);
+                    alert("Wicket! ✅ Select next batsman");
+                }
+            }
+
+            runsInput.value = "";
+            saveMatch();
+            renderAll();
+
+            // ✅ Auto win check (innings 2 chase)
+            if (match.currentInnings === 2 && match.target) {
+                if (match.innings2.runs >= match.target) {
+                    match.ended2 = true;
+                    saveMatch();
+                    renderAll();
+                    alert("Target Chased ✅ Match ended!");
+                }
+            }
+        }
+
+
+        function undoBall(inn) {
+            if (inn.events.length === 0) return;
+
+            const last = inn.events.pop();
+            const batsman = inn.batsmen[last.striker];
+            const bow = inn.bowlers[last.bowler];
+
+            if (last.type === "wide") {
+                inn.runs -= 1;
+                inn.wides -= 1;
+                bow.runs -= 1;
+
+            } else if (last.type === "noball") {
+                inn.runs -= 1;
+                inn.noballs -= 1;
+                bow.runs -= 1;
+
+            } else if (last.type === "wicket") {
+                inn.legalBalls -= 1;
+                inn.wkts -= 1;
+
+                batsman.balls -= 1;
+                batsman.runs -= last.runs;
+                if (last.runs === 4) batsman.fours -= 1;
+                if (last.runs === 6) batsman.sixes -= 1;
+
+                bow.legalBalls -= 1;
+                bow.runs -= last.runs;
+                bow.wkts -= 1;
+
+                // undo out
+                batsman.out = false;
+
+                inn.runs -= last.runs;
+
+            } else {
+                inn.legalBalls -= 1;
+
+                batsman.balls -= 1;
+                batsman.runs -= last.runs;
+                if (last.runs === 4) batsman.fours -= 1;
+                if (last.runs === 6) batsman.sixes -= 1;
+
+                bow.legalBalls -= 1;
+                bow.runs -= last.runs;
+
+                inn.runs -= last.runs;
+            }
+
+            saveMatch();
+            renderAll();
+        }
+
+        function endInnings1() {
+            if (!match.started) return;
+            if (match.ended1) {
+                alert("Innings 1 already ended ✅");
+                return;
+            }
+
+            match.ended1 = true;
+            match.currentInnings = 2;
+            match.target = match.innings1.runs + 1;
+
+            innings2Info.textContent = `${match.innings2.battingName} Batting (Chase)`;
+            targetBox.style.display = "block";
+            targetBox.innerHTML = `🎯 Target: <b>${match.target}</b>`;
+
+            // Fill dropdowns for innings2 now
+            // fillSelect(i2Striker, match.innings2.battingPlayers, "Select Striker");
+            // fillSelect(i2NonStriker, match.innings2.battingPlayers, "Select Non-Striker");
+            // fillSelect(i2Bowler, match.innings2.bowlingPlayers, "Select Bowler");
+
+            fillSelect(i2Striker, match.innings2.battingPlayers, "Select Striker");
+            fillSelect(i2NonStriker, match.innings2.battingPlayers, "Select Non-Striker");
+            fillSelect(i2Bowler, match.innings2.bowlingPlayers, "Select Bowler");
+
+            // ✅ remove OUT batsmen from selection (none out at start, but keep safe)
+            refreshBatsmanDropdowns(match.innings2, i2Striker, i2NonStriker);
+
+            saveMatch();
+            renderAll();
+
+            alert(`Innings 1 ended ✅ Target is ${match.target}`);
+        }
+
+        function endMatch() {
+            if (!match.started) return;
+            if (!match.ended1) {
+                alert("End Innings 1 first ✅");
+                return;
+            }
+            match.ended2 = true;
+            saveMatch();
+            renderAll();
+            alert("Match Ended ✅");
+        }
+
+        function showResult() {
+            const i1 = match.innings1;
+            const i2 = match.innings2;
+
+            resultCard.style.display = "block";
+
+            // If chased
+            if (match.target && i2.runs >= match.target) {
+                const wktsLeft = (i2.battingPlayers.length - 1) - i2.wkts;
+                resultText.innerHTML = `
+          🏆 <b>${i2.battingName}</b> won by <b>${wktsLeft}</b> wickets <br/>
+          ✅ Chased <b>${match.target}</b> in <b>${oversText(i2.legalBalls)}</b> overs
+        `;
+                return;
+            }
+
+            // If not chased
+            if (i1.runs > i2.runs) {
+                const winByRuns = i1.runs - i2.runs;
+                resultText.innerHTML = `
+          🏆 <b>${i1.battingName}</b> won by <b>${winByRuns}</b> runs <br/>
+          Final: <b>${i1.runs}</b> vs <b>${i2.runs}</b>
+        `;
+            } else if (i2.runs > i1.runs) {
+                // can happen if no target used
+                const wktsLeft = (i2.battingPlayers.length - 1) - i2.wkts;
+                resultText.innerHTML = `
+          🏆 <b>${i2.battingName}</b> won by <b>${wktsLeft}</b> wickets
+        `;
+            } else {
+                resultText.innerHTML = `🤝 Match Tied! Final: <b>${i1.runs}</b> vs <b>${i2.runs}</b>`;
+            }
+        }
+
+        // ===========================
+        // Downloads
+        // ===========================
+        async function downloadPNG(el, filename) {
+            if (!match.started) {
+                alert("Start match first ✅");
+                return;
+            }
+            const canvas = await html2canvas(el, { scale: 2, backgroundColor: null });
+            const url = canvas.toDataURL("image/png");
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            a.click();
+        }
+
+        // ===========================
+        // Events
+        // ===========================
+        backBtn.addEventListener("click", () => window.location.href = "index.html");
+        startMatch.addEventListener("click", startNewMatch);
+
+        i1AddBall.addEventListener("click", () => addBallToInnings(match.innings1, i1Striker, i1NonStriker, i1Bowler, i1BallType, i1BallRuns));
+        i1Undo.addEventListener("click", () => undoBall(match.innings1));
+        i1EndInnings.addEventListener("click", endInnings1);
+
+        i2AddBall.addEventListener("click", () => addBallToInnings(match.innings2, i2Striker, i2NonStriker, i2Bowler, i2BallType, i2BallRuns));
+        i2Undo.addEventListener("click", () => undoBall(match.innings2));
+        i2EndMatch.addEventListener("click", endMatch);
+
+        downloadInnings1.addEventListener("click", () => downloadPNG(captureInnings1, "innings1-scorecard.png"));
+        downloadInnings2.addEventListener("click", () => downloadPNG(captureInnings2, "innings2-scorecard.png"));
+        clearScorecard.addEventListener("click", clearFullScorecard);
+
+        // ===========================
+        // Init
+        // ===========================
+        initSetup();
+        loadMatch();
+
+        // If match already started, render it
+        if (match.started && match.innings1 && match.innings2) {
+            innings1Info.textContent = `${match.innings1.battingName} Batting`;
+            innings2Info.textContent = match.ended1 ? `${match.innings2.battingName} Batting (Chase)` : "Waiting...";
+
+            if (match.oversLimit > 0) oversLimit.value = match.oversLimit;
+
+            // Fill dropdowns based on current innings availability
+            fillSelect(i1Striker, match.innings1.battingPlayers, "Select Striker");
+            fillSelect(i1NonStriker, match.innings1.battingPlayers, "Select Non-Striker");
+            fillSelect(i1Bowler, match.innings1.bowlingPlayers, "Select Bowler");
+
+            if (match.ended1) {
+                fillSelect(i2Striker, match.innings2.battingPlayers, "Select Striker");
+                fillSelect(i2NonStriker, match.innings2.battingPlayers, "Select Non-Striker");
+                fillSelect(i2Bowler, match.innings2.bowlingPlayers, "Select Bowler");
+            }
+
+            if (match.target) {
+                targetBox.style.display = "block";
+            }
+            if (match.ended2) {
+                resultCard.style.display = "block";
+            }
+
+            renderAll();
+        } else {
+            // not started
+            innings1Info.textContent = "Not Started";
+            innings2Info.textContent = "Not Started";
+        }
+    </script>
+</body>
+
+</html>

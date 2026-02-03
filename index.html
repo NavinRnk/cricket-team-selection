@@ -4,41 +4,47 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cricket Team Splitter (Role Wise)</title>
+    <title>Cricket Team Selection (Role Wise)</title>
 
-    <!-- Download libs -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
     <style>
         :root {
-            --bg1: #0b1220;
-            --bg2: #0f172a;
-            --stroke: rgba(255, 255, 255, .08);
             --text: #e5e7eb;
             --muted: #94a3b8;
-            --shadow: 0 18px 40px rgba(0, 0, 0, .35);
             --radius: 18px;
+            --stroke: rgba(255, 255, 255, .12);
 
             --green: rgba(34, 197, 94, .95);
             --blue: rgba(96, 165, 250, .95);
-            --red: rgba(239, 68, 68, .85);
-            --gold: rgba(250, 204, 21, .85);
-        }
 
-        * {
-            box-sizing: border-box
+            --control-h: 46px;
+            /* change if you want bigger (ex: 50px) */
+            --control-pad-x: 14px;
+            --control-font: 14px;
         }
 
         body {
             margin: 0;
             font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-            background: radial-gradient(1200px 700px at 20% 10%, #1d4ed8 0%, transparent 55%),
-                radial-gradient(900px 600px at 90% 30%, #22c55e 0%, transparent 55%),
-                linear-gradient(180deg, var(--bg1), var(--bg2));
+            background-repeat: no-repeat;
+            background-size: cover;
             color: var(--text);
             min-height: 100vh;
             padding: 28px;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(rgba(5, 15, 30, 0.55), rgba(5, 15, 30, 0.55)),
+                url("backround.jpg");
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
         }
 
         .container {
@@ -79,50 +85,66 @@
         }
 
         .card {
-            background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .03));
-            border: 1px solid var(--stroke);
+            background: rgba(10, 20, 35, 0.55);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
             padding: 16px;
+            animation: fadeUp 0.45s ease both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0px);
+            }
         }
 
         .card h2 {
             margin: 0 0 12px;
             font-size: 16px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
             gap: 10px;
+            align-items: center;
         }
 
         .badge {
             font-size: 12px;
             padding: 4px 10px;
             border-radius: 999px;
-            border: 1px solid var(--stroke);
-            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .14);
+            background: rgba(255, 255, 255, .06);
             color: var(--muted);
         }
 
         input,
         select {
             width: 100%;
-            padding: 12px 12px;
+            padding: 12px;
             border-radius: 14px;
-            border: 1px solid var(--stroke);
-            background: rgba(15, 23, 42, .55);
+            border: 1px solid rgba(255, 255, 255, .14);
+            background: rgba(15, 23, 42, 0.35);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             color: var(--text);
             outline: none;
-            transition: .2s ease;
         }
 
         input::placeholder {
-            color: rgba(148, 163, 184, .7)
+            color: rgba(148, 163, 184, .75);
         }
 
         input:focus,
         select:focus {
-            border-color: rgba(96, 165, 250, .8);
+            border-color: rgba(96, 165, 250, .75);
             box-shadow: 0 0 0 4px rgba(96, 165, 250, .15);
         }
 
@@ -133,12 +155,26 @@
             margin-top: 10px;
         }
 
+        .two {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media(max-width:540px) {
+            .two {
+                grid-template-columns: 1fr
+            }
+        }
+
         .btn {
             padding: 12px 14px;
-            border: 1px solid var(--stroke);
-            background: rgba(255, 255, 255, .06);
-            color: var(--text);
             border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, .14);
+            background: rgba(255, 255, 255, .06);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            color: var(--text);
             cursor: pointer;
             font-weight: 700;
             transition: .18s ease;
@@ -146,27 +182,29 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, .25);
             user-select: none;
         }
 
         .btn:hover {
-            transform: translateY(-1px);
-            background: rgba(255, 255, 255, .09);
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, .10);
+            box-shadow: 0 12px 22px rgba(0, 0, 0, .35);
         }
 
         .btn:active {
-            transform: translateY(0px)
+            transform: translateY(0px);
         }
 
         .btn.primary {
-            background: linear-gradient(135deg, var(--green), var(--blue));
-            border: none;
+            border: 1px solid rgba(34, 197, 94, .22);
+            background: linear-gradient(135deg, rgba(34, 197, 94, .95), rgba(96, 165, 250, .92));
             color: #06121f;
         }
 
         .btn.danger {
+            border: 1px solid rgba(239, 68, 68, .22);
             background: rgba(239, 68, 68, .14);
-            border: 1px solid rgba(239, 68, 68, .25);
             color: #fecaca;
         }
 
@@ -178,21 +216,8 @@
 
         .divider {
             height: 1px;
-            background: var(--stroke);
+            background: rgba(255, 255, 255, .12);
             margin: 14px 0;
-        }
-
-        .two {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            width: 100%;
-        }
-
-        @media (max-width:540px) {
-            .two {
-                grid-template-columns: 1fr
-            }
         }
 
         .players {
@@ -200,9 +225,33 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 450px;
+            max-height: 320px;
             overflow: auto;
             padding-right: 4px;
+            scroll-behavior: smooth;
+        }
+
+        .players::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .players::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, .06);
+            border-radius: 20px;
+        }
+
+        .players::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .18);
+            border-radius: 20px;
+        }
+
+        .players::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, .28);
+        }
+
+        .players {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, .22) rgba(255, 255, 255, .05);
         }
 
         .player {
@@ -212,17 +261,23 @@
             gap: 10px;
             padding: 10px 12px;
             border-radius: 14px;
-            border: 1px solid var(--stroke);
+            border: 1px solid rgba(255, 255, 255, .12);
             background: rgba(255, 255, 255, .04);
+            transition: .18s ease;
         }
 
-        .player .left {
+        .player:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, .06);
+        }
+
+        .left {
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
-        .player .name {
+        .name {
             font-weight: 800;
             font-size: 14px;
         }
@@ -232,8 +287,8 @@
             font-size: 12px;
             padding: 4px 10px;
             border-radius: 999px;
-            border: 1px solid var(--stroke);
-            color: var(--muted);
+            border: 1px solid rgba(255, 255, 255, .14);
+            color: rgba(226, 232, 240, .9);
             background: rgba(15, 23, 42, .35);
         }
 
@@ -243,7 +298,7 @@
             gap: 14px;
         }
 
-        @media (max-width:980px) {
+        @media(max-width:980px) {
             .teamsWrap {
                 grid-template-columns: 1fr
             }
@@ -251,15 +306,36 @@
 
         .teamCard {
             border-radius: var(--radius);
-            border: 1px solid var(--stroke);
-            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(15, 25, 45, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
             padding: 14px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            animation: fadeUp 0.45s ease both;
+        }
+
+        .teamCard::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(600px 220px at 20% 0%, rgba(96, 165, 250, 0.16), transparent 55%),
+                radial-gradient(520px 220px at 85% 15%, rgba(34, 197, 94, 0.14), transparent 60%);
+            pointer-events: none;
+        }
+
+        .teamCard:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 34px rgba(0, 0, 0, .45);
         }
 
         .teamHeader {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             gap: 10px;
             margin-bottom: 10px;
         }
@@ -268,51 +344,48 @@
             font-size: 16px;
         }
 
-        .metaSmall {
-            margin-top: 6px;
-            font-size: 12px;
-            color: rgba(148, 163, 184, .95);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .tag {
-            border: 1px solid var(--stroke);
-            background: rgba(255, 255, 255, .04);
-            padding: 4px 10px;
-            border-radius: 999px;
-            width: max-content;
-        }
-
-        .capTag {
-            border-color: rgba(250, 204, 21, .28);
-            background: rgba(250, 204, 21, .08);
-            color: #fff7cc;
-        }
-
-        .vcTag {
-            border-color: rgba(96, 165, 250, .28);
-            background: rgba(96, 165, 250, .08);
-            color: #dbeafe;
-        }
-
         .list {
             display: flex;
             flex-direction: column;
             gap: 8px;
             margin-top: 10px;
+            max-height: 260px;
+            overflow: auto;
+        }
+
+        .list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, .06);
+            border-radius: 20px;
+        }
+
+        .list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .18);
+            border-radius: 20px;
+        }
+
+        .list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, .28);
         }
 
         .listItem {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             gap: 10px;
             padding: 10px 12px;
             border-radius: 14px;
             background: rgba(15, 23, 42, .4);
-            border: 1px solid var(--stroke);
+            border: 1px solid rgba(255, 255, 255, .12);
+            transition: .18s ease;
+        }
+
+        .listItem:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, .06);
         }
 
         .empty {
@@ -342,7 +415,7 @@
             margin-top: 12px;
             padding: 10px 12px;
             border-radius: 14px;
-            border: 1px solid var(--stroke);
+            border: 1px solid rgba(255, 255, 255, .12);
             background: rgba(15, 23, 42, .45);
             color: rgba(226, 232, 240, .92);
             font-size: 13px;
@@ -360,34 +433,138 @@
             line-height: 1.4;
         }
 
-        .downloadWrap {
-            margin-top: 12px;
-            padding: 12px;
-            border-radius: 18px;
-            border: 1px solid rgba(255, 255, 255, .10);
-            background: rgba(15, 23, 42, .35);
-        }
-
         #captureArea {
             border-radius: 18px;
             padding: 10px;
         }
+
+        input,
+        select,
+        button {
+            font-size: var(--control-font);
+            line-height: 1.2;
+        }
+
+        /* ✅ Inputs + dropdowns same height */
+        input,
+        select {
+            height: var(--control-h);
+            padding: 0 var(--control-pad-x);
+            border-radius: 14px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+
+            /* your glass style */
+            background: rgba(15, 23, 42, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            color: var(--text);
+        }
+
+        /* ✅ Placeholder vertically centered */
+        input::placeholder {
+            color: rgba(148, 163, 184, 0.75);
+            font-size: var(--control-font);
+            line-height: var(--control-h);
+        }
+
+        /* ✅ Fix number input padding/align */
+        input[type="number"] {
+            padding-right: 12px;
+        }
+
+        /* ✅ Custom dropdown arrow (pure CSS) */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+
+            /* space for arrow */
+            padding-right: 44px;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            /* Arrow icon using background */
+            background-image:
+                linear-gradient(45deg, transparent 50%, rgba(226, 232, 240, .9) 50%),
+                linear-gradient(135deg, rgba(226, 232, 240, .9) 50%, transparent 50%),
+                linear-gradient(to right, rgba(255, 255, 255, .12), rgba(255, 255, 255, .12));
+            background-position:
+                calc(100% - 18px) 52%,
+                calc(100% - 12px) 52%,
+                calc(100% - 42px) 50%;
+            background-size:
+                6px 6px,
+                6px 6px,
+                1px 60%;
+            background-repeat: no-repeat;
+        }
+
+        /* ✅ On hover: arrow more visible */
+        select:hover {
+            border-color: rgba(255, 255, 255, .20);
+        }
+
+        /* ✅ Focus style consistent */
+        input:focus,
+        select:focus {
+            border-color: rgba(96, 165, 250, .75);
+            box-shadow: 0 0 0 4px rgba(96, 165, 250, .15);
+            outline: none;
+        }
+
+        /* ✅ Buttons same height as inputs */
+        .btn {
+            height: var(--control-h);
+            padding: 0 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ✅ Small buttons stay small but aligned */
+        .btn.small {
+            height: 34px;
+            padding: 0 12px;
+        }
+
+        /* ✅ Prevent overlap issue in grids */
+        .two>*,
+        .three>* {
+            min-width: 0 !important;
+        }
+
+        input,
+        select {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+        
     </style>
 </head>
 
 <body>
     <div class="container">
         <header>
-            <h1>Cricket Team Selection</h1>
+            <h1>🏏 Team Selection (Role Wise Balanced)</h1>
+            <p>
+                Add players with role, split equally by role, choose Common player manually if odd.
+                After split → go to Scorecard page.
+            </p>
         </header>
 
         <div class="grid">
-            <!-- LEFT: Players -->
+            <!-- LEFT -->
             <div class="card">
                 <h2>Players <span class="badge" id="playerCountBadge">0 Players</span></h2>
 
                 <div class="two">
-                    <input id="playerName" type="text" placeholder="Enter player name" />
+                    <input id="playerName" type="text" placeholder="Enter player name (ex: Dhoni)" />
                     <select id="playerRole">
                         <option value="Batsman">Batsman</option>
                         <option value="Bowler">Bowler</option>
@@ -397,18 +574,19 @@
                 </div>
 
                 <div class="row">
-                    <button class="btn primary" id="addBtn">Add Player</button>
-                    <button class="btn danger" id="clearBtn">Clear All</button>
+                    <button class="btn primary" id="addBtn">➕ Add Player</button>
+                    <button class="btn danger" id="clearBtn">🗑️ Clear All</button>
                 </div>
 
-                <div class="divider"></div>
+                <div class="notice">✅ Saved in LocalStorage automatically</div>
 
+                <div class="divider"></div>
                 <h2>Player List <span class="badge">Role</span></h2>
                 <div class="players" id="playersList"></div>
                 <div class="toast" id="toast"></div>
             </div>
 
-            <!-- RIGHT: Settings + Teams -->
+            <!-- RIGHT -->
             <div class="card">
                 <h2>Team Settings <span class="badge">Customize</span></h2>
 
@@ -423,11 +601,12 @@
                 <select id="commonSelect">
                     <option value="">Auto Select (last player)</option>
                 </select>
-                <div class="notice">✅ Used only when players count is odd.</div>
+                <div class="notice">✅ Used only when total players are odd</div>
 
                 <div class="row" style="margin-top:12px;">
                     <button class="btn primary" id="splitBtn">⚡ Split Teams</button>
                     <button class="btn" id="shuffleBtn">🔄 Shuffle & Split</button>
+                    <button class="btn primary" id="gotoScorecard">📊 Scorecard</button>
                 </div>
 
                 <div class="divider"></div>
@@ -436,44 +615,20 @@
                     <h2>Teams Output <span class="badge">Role Balanced</span></h2>
 
                     <div class="teamsWrap">
-                        <!-- Team A -->
                         <div class="teamCard">
                             <div class="teamHeader">
                                 <div class="teamTitle"><strong id="teamATitle">Team A</strong></div>
                                 <span class="badge" id="teamACount">0</span>
                             </div>
-
-                            <div class="two">
-                                <select id="captainA">
-                                    <option value="">Select Captain (Team A)</option>
-                                </select>
-                                <select id="viceCaptainA">
-                                    <option value="">Select Vice Captain (Team A)</option>
-                                </select>
-                            </div>
-
-                            <div class="metaSmall" id="capMetaA"></div>
                             <div class="list" id="teamAList"></div>
                             <div class="empty" id="teamAEmpty">No players yet</div>
                         </div>
 
-                        <!-- Team B -->
                         <div class="teamCard">
                             <div class="teamHeader">
                                 <div class="teamTitle"><strong id="teamBTitle">Team B</strong></div>
                                 <span class="badge" id="teamBCount">0</span>
                             </div>
-
-                            <div class="two">
-                                <select id="captainB">
-                                    <option value="">Select Captain (Team B)</option>
-                                </select>
-                                <select id="viceCaptainB">
-                                    <option value="">Select Vice Captain (Team B)</option>
-                                </select>
-                            </div>
-
-                            <div class="metaSmall" id="capMetaB"></div>
                             <div class="list" id="teamBList"></div>
                             <div class="empty" id="teamBEmpty">No players yet</div>
                         </div>
@@ -485,36 +640,22 @@
                     </div>
                 </div>
 
-                <div class="downloadWrap">
-                    <h2>Download / Share <span class="badge">PNG / PDF / WhatsApp</span></h2>
-                    <div class="row">
-                        <button class="btn" id="downloadPNG">🖼️ PNG</button>
-                        <button class="btn" id="downloadPDF">📄 PDF</button>
-                        <button class="btn primary" id="copyWhatsapp">📋 WhatsApp</button>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
 
     <script>
         // ===========================
-        // LocalStorage Keys
+        // LocalStorage Keys (Shared with scorecard.html)
         // ===========================
         const LS_PLAYERS = "cricket_players_role_v1";
         const LS_TEAMA = "cricket_teamA_name_role_v1";
         const LS_TEAMB = "cricket_teamB_name_role_v1";
+        const LS_SPLIT = "cricket_last_split_v1";
 
-        // ===========================
-        // State
-        // ===========================
-        let players = []; // { name, role }
+        let players = [];
         let lastSplit = { teamA: [], teamB: [], common: null };
 
-        // ===========================
-        // Elements
-        // ===========================
         const playerName = document.getElementById("playerName");
         const playerRole = document.getElementById("playerRole");
         const addBtn = document.getElementById("addBtn");
@@ -528,6 +669,7 @@
 
         const splitBtn = document.getElementById("splitBtn");
         const shuffleBtn = document.getElementById("shuffleBtn");
+        const gotoScorecard = document.getElementById("gotoScorecard");
 
         const teamATitle = document.getElementById("teamATitle");
         const teamBTitle = document.getElementById("teamBTitle");
@@ -541,28 +683,11 @@
         const teamBCount = document.getElementById("teamBCount");
 
         const commonSelect = document.getElementById("commonSelect");
-
         const commonBox = document.getElementById("commonBox");
         const commonPlayer = document.getElementById("commonPlayer");
 
         const toast = document.getElementById("toast");
 
-        const captainA = document.getElementById("captainA");
-        const viceCaptainA = document.getElementById("viceCaptainA");
-        const captainB = document.getElementById("captainB");
-        const viceCaptainB = document.getElementById("viceCaptainB");
-
-        const capMetaA = document.getElementById("capMetaA");
-        const capMetaB = document.getElementById("capMetaB");
-
-        const captureArea = document.getElementById("captureArea");
-        const downloadPNG = document.getElementById("downloadPNG");
-        const downloadPDF = document.getElementById("downloadPDF");
-        const copyWhatsapp = document.getElementById("copyWhatsapp");
-
-        // ===========================
-        // Helpers
-        // ===========================
         function showToast(msg) {
             toast.textContent = msg;
             toast.classList.add("show");
@@ -577,23 +702,24 @@
             localStorage.setItem(LS_PLAYERS, JSON.stringify(players));
             localStorage.setItem(LS_TEAMA, teamAName.value);
             localStorage.setItem(LS_TEAMB, teamBName.value);
+            localStorage.setItem(LS_SPLIT, JSON.stringify(lastSplit));
         }
 
         function loadFromLocalStorage() {
             const savedPlayers = localStorage.getItem(LS_PLAYERS);
             const savedA = localStorage.getItem(LS_TEAMA);
             const savedB = localStorage.getItem(LS_TEAMB);
+            const savedSplit = localStorage.getItem(LS_SPLIT);
 
             if (savedPlayers) {
-                try {
-                    players = JSON.parse(savedPlayers) || [];
-                } catch (e) {
-                    players = [];
-                }
+                try { players = JSON.parse(savedPlayers) || []; } catch { players = []; }
             }
-
             if (savedA) teamAName.value = savedA;
             if (savedB) teamBName.value = savedB;
+
+            if (savedSplit) {
+                try { lastSplit = JSON.parse(savedSplit) || { teamA: [], teamB: [], common: null }; } catch { }
+            }
         }
 
         function updatePlayerCount() {
@@ -606,21 +732,6 @@
                 [arr[i], arr[j]] = [arr[j], arr[i]];
             }
             return arr;
-        }
-
-        function clearTeams() {
-            lastSplit = { teamA: [], teamB: [], common: null };
-            teamAList.innerHTML = "";
-            teamBList.innerHTML = "";
-            teamAEmpty.style.display = "block";
-            teamBEmpty.style.display = "block";
-            teamACount.textContent = "0";
-            teamBCount.textContent = "0";
-            commonBox.style.display = "none";
-            commonPlayer.innerHTML = "";
-
-            fillCaptainDropdowns([], []);
-            updateCaptainTags();
         }
 
         function renderPlayers() {
@@ -653,27 +764,70 @@
 
         function removePlayer(index) {
             const removed = players.splice(index, 1);
+            showToast(`Removed: ${removed[0].name}`);
             renderPlayers();
             clearTeams();
-            showToast(`Removed: ${removed[0].name}`);
         }
 
         function updateCommonDropdown() {
             const currentValue = commonSelect.value;
-
             commonSelect.innerHTML = `<option value="">Auto Select (last player)</option>`;
-            players.forEach((p) => {
+            players.forEach(p => {
                 const opt = document.createElement("option");
                 opt.value = p.name;
                 opt.textContent = `${p.name} (${p.role})`;
                 commonSelect.appendChild(opt);
             });
-
             if ([...commonSelect.options].some(o => o.value === currentValue)) {
                 commonSelect.value = currentValue;
             } else {
                 commonSelect.value = "";
             }
+        }
+
+        function groupByRole(list) {
+            const roles = {
+                "Wicket keeper": [],
+                "Batsman": [],
+                "Allrounder": [],
+                "Bowler": []
+            };
+            list.forEach(p => {
+                if (!roles[p.role]) roles[p.role] = [];
+                roles[p.role].push(p);
+            });
+            return roles;
+        }
+
+        function splitByRoleEqual(list, targetSize) {
+            const roles = groupByRole(list);
+            const roleOrder = ["Wicket keeper", "Batsman", "Allrounder", "Bowler"];
+            roleOrder.forEach(r => shuffleArray(roles[r]));
+
+            const teamA = [], teamB = [];
+
+            // half-half
+            roleOrder.forEach(role => {
+                const arr = roles[role];
+                const half = Math.floor(arr.length / 2);
+                teamA.push(...arr.slice(0, half));
+                teamB.push(...arr.slice(half, half + half));
+                roles[role] = arr.slice(half + half); // leftovers
+            });
+
+            // leftovers to maintain equal size
+            roleOrder.forEach(role => {
+                roles[role].forEach(p => {
+                    if (teamA.length < targetSize) teamA.push(p);
+                    else teamB.push(p);
+                });
+            });
+
+            // safety exact
+            while (teamA.length > targetSize) teamB.push(teamA.pop());
+            while (teamB.length > targetSize) teamA.push(teamB.pop());
+
+            return { teamA, teamB };
         }
 
         function renderTeamList(container, emptyEl, list) {
@@ -683,7 +837,6 @@
                 return;
             }
             emptyEl.style.display = "none";
-
             list.forEach(p => {
                 const item = document.createElement("div");
                 item.className = "listItem";
@@ -695,116 +848,17 @@
             });
         }
 
-        function fillSelect(selectEl, options, placeholder) {
-            const current = selectEl.value;
-            selectEl.innerHTML = `<option value="">${placeholder}</option>`;
-            options.forEach(p => {
-                const opt = document.createElement("option");
-                opt.value = p.name;
-                opt.textContent = `${p.name} (${p.role})`;
-                selectEl.appendChild(opt);
-            });
-
-            if (options.some(p => p.name === current)) {
-                selectEl.value = current;
-            } else {
-                selectEl.value = "";
-            }
-        }
-
-        function fillCaptainDropdowns(teamA, teamB) {
-            fillSelect(captainA, teamA, "Select Captain (Team A)");
-            fillSelect(viceCaptainA, teamA, "Select Vice Captain (Team A)");
-            fillSelect(captainB, teamB, "Select Captain (Team B)");
-            fillSelect(viceCaptainB, teamB, "Select Vice Captain (Team B)");
-        }
-
-        function updateCaptainTags() {
-            const capA = captainA.value;
-            const vcA = viceCaptainA.value;
-            const capB = captainB.value;
-            const vcB = viceCaptainB.value;
-
-            capMetaA.innerHTML = "";
-            capMetaB.innerHTML = "";
-
-            if (capA) capMetaA.innerHTML += `<span class="tag capTag">👑 Captain: <b>${capA}</b></span>`;
-            if (vcA) capMetaA.innerHTML += `<span class="tag vcTag">⭐ Vice: <b>${vcA}</b></span>`;
-
-            if (capB) capMetaB.innerHTML += `<span class="tag capTag">👑 Captain: <b>${capB}</b></span>`;
-            if (vcB) capMetaB.innerHTML += `<span class="tag vcTag">⭐ Vice: <b>${vcB}</b></span>`;
-        }
-
-        function validateCaptainVice() {
-            if (captainA.value && viceCaptainA.value && captainA.value === viceCaptainA.value) {
-                showToast("Team A: Captain & Vice cannot be same ⚠️");
-                viceCaptainA.value = "";
-            }
-            if (captainB.value && viceCaptainB.value && captainB.value === viceCaptainB.value) {
-                showToast("Team B: Captain & Vice cannot be same ⚠️");
-                viceCaptainB.value = "";
-            }
-            updateCaptainTags();
-        }
-
-        // ✅ Role grouping
-        function groupByRole(list) {
-            const roles = {
-                "Wicket keeper": [],
-                "Batsman": [],
-                "Allrounder": [],
-                "Bowler": []
-            };
-
-            list.forEach(p => {
-                if (!roles[p.role]) roles[p.role] = [];
-                roles[p.role].push(p);
-            });
-
-            return roles;
-        }
-
-        // ✅ ROLE-WISE BALANCED + EQUAL TEAM SIZE
-        function splitByRoleEqual(list, targetSize) {
-            const roles = groupByRole(list);
-            const roleOrder = ["Wicket keeper", "Batsman", "Allrounder", "Bowler"];
-
-            roleOrder.forEach(r => shuffleArray(roles[r])); // random inside role
-
-            const teamA = [];
-            const teamB = [];
-
-            // Step 1: split each role half-half
-            roleOrder.forEach(role => {
-                const arr = roles[role];
-                const half = Math.floor(arr.length / 2);
-
-                teamA.push(...arr.slice(0, half));
-                teamB.push(...arr.slice(half, half + half));
-
-                // leftover (if odd) keep aside
-                roles[role] = arr.slice(half + half);
-            });
-
-            // Step 2: distribute leftovers to keep equal size
-            roleOrder.forEach(role => {
-                const leftovers = roles[role];
-                leftovers.forEach(p => {
-                    // give extra to team that has less players
-                    if (teamA.length < targetSize) teamA.push(p);
-                    else teamB.push(p);
-                });
-            });
-
-            // Step 3: final safety (ensure exact sizes)
-            while (teamA.length > targetSize) {
-                teamB.push(teamA.pop());
-            }
-            while (teamB.length > targetSize) {
-                teamA.push(teamB.pop());
-            }
-
-            return { teamA, teamB };
+        function clearTeams() {
+            lastSplit = { teamA: [], teamB: [], common: null };
+            teamAList.innerHTML = "";
+            teamBList.innerHTML = "";
+            teamAEmpty.style.display = "block";
+            teamBEmpty.style.display = "block";
+            teamACount.textContent = "0";
+            teamBCount.textContent = "0";
+            commonBox.style.display = "none";
+            commonPlayer.innerHTML = "";
+            saveToLocalStorage();
         }
 
         function splitTeams(doShuffle = false) {
@@ -823,16 +877,13 @@
             if (doShuffle) list = shuffleArray(list);
 
             let common = null;
-
-            // odd => manual common
             if (list.length % 2 === 1) {
-                const selectedCommon = commonSelect.value;
-
-                if (selectedCommon) {
-                    const found = list.find(p => p.name === selectedCommon);
+                const selected = commonSelect.value;
+                if (selected) {
+                    const found = list.find(p => p.name === selected);
                     if (found) {
                         common = found;
-                        list = list.filter(p => p.name !== selectedCommon);
+                        list = list.filter(p => p.name !== selected);
                     } else {
                         common = list.pop();
                     }
@@ -842,20 +893,16 @@
             }
 
             const targetSize = list.length / 2;
+            const { teamA, teamB } = splitByRoleEqual(list, targetSize);
 
-            // ✅ role-wise equal split
-            const result = splitByRoleEqual(list, targetSize);
+            lastSplit = { teamA, teamB, common };
+            saveToLocalStorage();
 
-            lastSplit = { teamA: result.teamA, teamB: result.teamB, common };
+            renderTeamList(teamAList, teamAEmpty, teamA);
+            renderTeamList(teamBList, teamBEmpty, teamB);
 
-            renderTeamList(teamAList, teamAEmpty, lastSplit.teamA);
-            renderTeamList(teamBList, teamBEmpty, lastSplit.teamB);
-
-            teamACount.textContent = lastSplit.teamA.length;
-            teamBCount.textContent = lastSplit.teamB.length;
-
-            fillCaptainDropdowns(lastSplit.teamA, lastSplit.teamB);
-            updateCaptainTags();
+            teamACount.textContent = teamA.length;
+            teamBCount.textContent = teamB.length;
 
             if (common) {
                 commonBox.style.display = "block";
@@ -864,145 +911,27 @@
             <div style="font-weight:800">${common.name}</div>
             <span class="roleTag">${common.role}</span>
           </div>
-          <div style="margin-top:8px;color:rgba(148,163,184,.95);font-size:12px;">
-            This player plays for <b>both Team A & Team B</b>.
-          </div>
         `;
             } else {
                 commonBox.style.display = "none";
                 commonPlayer.innerHTML = "";
             }
 
-            showToast(`Role split ✅ (${lastSplit.teamA.length} vs ${lastSplit.teamB.length})`);
-            saveToLocalStorage();
+            showToast(`Split done ✅ (${teamA.length} vs ${teamB.length})`);
         }
 
-        // WhatsApp Format
-        function buildWhatsAppText() {
-            if (lastSplit.teamA.length === 0 && lastSplit.teamB.length === 0) return "";
-
-            const teamA = normalizeName(teamAName.value || "Team A");
-            const teamB = normalizeName(teamBName.value || "Team B");
-
-            const capA = captainA.value || "Not Selected";
-            const vcA = viceCaptainA.value || "Not Selected";
-            const capB = captainB.value || "Not Selected";
-            const vcB = viceCaptainB.value || "Not Selected";
-
-            const common = lastSplit.common ? `${lastSplit.common.name} (${lastSplit.common.role})` : "None";
-
-            const formatList = (arr) =>
-                arr.map((p, i) => `${i + 1}. ${p.name} (${p.role})`).join("\n");
-
-            return `
-🏏 *CRICKET TEAMS (ROLE WISE)*
-
-🟢 *${teamA}*
-👑 Captain: *${capA}*
-⭐ Vice Captain: *${vcA}*
-Players:
-${formatList(lastSplit.teamA)}
-
-🔵 *${teamB}*
-👑 Captain: *${capB}*
-⭐ Vice Captain: *${vcB}*
-Players:
-${formatList(lastSplit.teamB)}
-
-⭐ *COMMON PLAYER*: *${common}*
-`.trim();
-        }
-
-        async function copyWhatsAppToClipboard() {
-            if (lastSplit.teamA.length === 0 && lastSplit.teamB.length === 0) {
-                showToast("Split teams first ✅");
-                return;
-            }
-            const text = buildWhatsAppText();
-            try {
-                await navigator.clipboard.writeText(text);
-                showToast("Copied for WhatsApp ✅");
-            } catch (err) {
-                const textarea = document.createElement("textarea");
-                textarea.value = text;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand("copy");
-                document.body.removeChild(textarea);
-                showToast("Copied (fallback) ✅");
-            }
-        }
-
-        // Download PNG
-        async function downloadAsPNG() {
-            if (lastSplit.teamA.length === 0 && lastSplit.teamB.length === 0) {
-                showToast("Split teams first ✅");
-                return;
-            }
-            showToast("Preparing PNG... ⏳");
-            const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: null });
-            const dataURL = canvas.toDataURL("image/png");
-            const a = document.createElement("a");
-            a.href = dataURL;
-            a.download = "cricket-teams-role.png";
-            a.click();
-            showToast("PNG downloaded ✅");
-        }
-
-        // Download PDF
-        async function downloadAsPDF() {
-            if (lastSplit.teamA.length === 0 && lastSplit.teamB.length === 0) {
-                showToast("Split teams first ✅");
-                return;
-            }
-            showToast("Preparing PDF... ⏳");
-
-            const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: "#0f172a" });
-            const imgData = canvas.toDataURL("image/png");
-
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF("p", "mm", "a4");
-
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-
-            const imgWidth = pageWidth;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-            const y = 8;
-            if (imgHeight > pageHeight - 16) {
-                const scale = (pageHeight - 16) / imgHeight;
-                pdf.addImage(imgData, "PNG", 0, y, imgWidth * scale, imgHeight * scale);
-            } else {
-                pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
-            }
-
-            pdf.save("cricket-teams-role.pdf");
-            showToast("PDF downloaded ✅");
-        }
-
-        // ===========================
-        // Events
-        // ===========================
         addBtn.addEventListener("click", () => {
             const name = normalizeName(playerName.value);
             const role = playerRole.value;
 
-            if (!name) {
-                showToast("Enter player name ✅");
-                return;
-            }
+            if (!name) { showToast("Enter player name ✅"); return; }
 
             const exists = players.some(p => p.name.toLowerCase() === name.toLowerCase());
-            if (exists) {
-                showToast("Player already exists ⚠️");
-                return;
-            }
+            if (exists) { showToast("Player already exists ⚠️"); return; }
 
             players.push({ name, role });
             playerName.value = "";
             playerName.focus();
-
             renderPlayers();
             clearTeams();
             showToast("Player added ✅");
@@ -1022,22 +951,39 @@ ${formatList(lastSplit.teamB)}
         splitBtn.addEventListener("click", () => splitTeams(false));
         shuffleBtn.addEventListener("click", () => splitTeams(true));
 
-        teamAName.addEventListener("input", saveToLocalStorage);
-        teamBName.addEventListener("input", saveToLocalStorage);
-
-        captainA.addEventListener("change", validateCaptainVice);
-        viceCaptainA.addEventListener("change", validateCaptainVice);
-        captainB.addEventListener("change", validateCaptainVice);
-        viceCaptainB.addEventListener("change", validateCaptainVice);
-
-        downloadPNG.addEventListener("click", downloadAsPNG);
-        downloadPDF.addEventListener("click", downloadAsPDF);
-        copyWhatsapp.addEventListener("click", copyWhatsAppToClipboard);
+        gotoScorecard.addEventListener("click", () => {
+            if (lastSplit.teamA.length === 0 || lastSplit.teamB.length === 0) {
+                showToast("Split teams first ✅");
+                return;
+            }
+            window.location.href = "scorecard.html";
+        });
 
         // init
         loadFromLocalStorage();
         renderPlayers();
-        clearTeams();
+
+        // if split exists show it
+        if (lastSplit.teamA?.length && lastSplit.teamB?.length) {
+            teamATitle.textContent = teamAName.value || "Team A";
+            teamBTitle.textContent = teamBName.value || "Team B";
+            renderTeamList(teamAList, teamAEmpty, lastSplit.teamA);
+            renderTeamList(teamBList, teamBEmpty, lastSplit.teamB);
+            teamACount.textContent = lastSplit.teamA.length;
+            teamBCount.textContent = lastSplit.teamB.length;
+
+            if (lastSplit.common) {
+                commonBox.style.display = "block";
+                commonPlayer.innerHTML = `
+          <div class="listItem" style="border-color: rgba(250,204,21,.28)">
+            <div style="font-weight:800">${lastSplit.common.name}</div>
+            <span class="roleTag">${lastSplit.common.role}</span>
+          </div>
+        `;
+            }
+        } else {
+            clearTeams();
+        }
 
         window.removePlayer = removePlayer;
     </script>
