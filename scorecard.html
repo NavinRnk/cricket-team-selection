@@ -14,7 +14,6 @@
             --muted: #94a3b8;
             --radius: 18px;
             --control-h: 46px;
-            /* change if you want bigger (ex: 50px) */
             --control-pad-x: 14px;
             --control-font: 14px;
         }
@@ -294,7 +293,6 @@
             line-height: 1.2;
         }
 
-        /* ✅ Inputs + dropdowns same height */
         input,
         select {
             height: var(--control-h);
@@ -304,7 +302,6 @@
             display: flex;
             align-items: center;
 
-            /* your glass style */
             background: rgba(15, 23, 42, 0.35);
             border: 1px solid rgba(255, 255, 255, 0.14);
             backdrop-filter: blur(14px);
@@ -312,32 +309,27 @@
             color: var(--text);
         }
 
-        /* ✅ Placeholder vertically centered */
         input::placeholder {
             color: rgba(148, 163, 184, 0.75);
             font-size: var(--control-font);
             line-height: var(--control-h);
         }
 
-        /* ✅ Fix number input padding/align */
         input[type="number"] {
             padding-right: 12px;
         }
 
-        /* ✅ Custom dropdown arrow (pure CSS) */
         select {
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
 
-            /* space for arrow */
             padding-right: 44px;
 
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
 
-            /* Arrow icon using background */
             background-image:
                 linear-gradient(45deg, transparent 50%, rgba(226, 232, 240, .9) 50%),
                 linear-gradient(135deg, rgba(226, 232, 240, .9) 50%, transparent 50%),
@@ -353,12 +345,10 @@
             background-repeat: no-repeat;
         }
 
-        /* ✅ On hover: arrow more visible */
         select:hover {
             border-color: rgba(255, 255, 255, .20);
         }
 
-        /* ✅ Focus style consistent */
         input:focus,
         select:focus {
             border-color: rgba(96, 165, 250, .75);
@@ -366,7 +356,6 @@
             outline: none;
         }
 
-        /* ✅ Buttons same height as inputs */
         .btn {
             height: var(--control-h);
             padding: 0 16px;
@@ -375,13 +364,11 @@
             justify-content: center;
         }
 
-        /* ✅ Small buttons stay small but aligned */
         .btn.small {
             height: 34px;
             padding: 0 12px;
         }
 
-        /* ✅ Prevent overlap issue in grids */
         .two>*,
         .three>* {
             min-width: 0 !important;
@@ -392,6 +379,20 @@
             width: 100%;
             max-width: 100%;
             min-width: 0;
+        }
+
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            width: 100%;
+            animation: fadeUp 0.45s ease both;
+        }
+
+        .footer p {
+            color: white !important;
+            font-size: 18px;
         }
     </style>
 </head>
@@ -604,6 +605,10 @@
 
             <div class="log" id="i2Log"></div>
         </div>
+    </div>
+
+    <div class="footer">
+        <p>Developed by KQ Developers</p>
     </div>
 
     <script>
@@ -943,7 +948,7 @@
             const s = localStorage.getItem(LS_SPLIT);
             if (!s) {
                 alert("Split teams first in Team Selection page!");
-                window.location.href = "index.html";
+                window.location.href = "home.html";
                 return;
             }
             splitData = JSON.parse(s);
@@ -1356,7 +1361,7 @@
         // ===========================
         // Events
         // ===========================
-        backBtn.addEventListener("click", () => window.location.href = "index.html");
+        backBtn.addEventListener("click", () => window.location.href = "home.html");
         startMatch.addEventListener("click", startNewMatch);
 
         i1AddBall.addEventListener("click", () => addBallToInnings(match.innings1, i1Striker, i1NonStriker, i1Bowler, i1BallType, i1BallRuns));
